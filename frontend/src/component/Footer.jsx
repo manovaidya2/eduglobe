@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import img from "../assets/logo.webp";
 
 // Custom SVG Icons (replacing lucide-react)
 const MailIcon = () => (
@@ -48,7 +49,7 @@ const Footer = () => {
           {/* Logo Image with responsive sizing */}
           <div className="relative">
            <img 
-  src="/src/assets/white bg.png"
+  src={img}
   alt="EduGlobe Logo"
   className=" w-24 h-18 sm:w-26 sm:h-20 md:w-30 md:h-24 lg:w-36 lg:h-26 xl:w-40 xl:h-28
    mt-[-36px]

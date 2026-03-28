@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
+import img from "../assets/logo.webp";
 
 // Icons (replacing lucide-react)
 const MenuIcon = () => (
@@ -51,7 +52,7 @@ const Navbar = () => {
           {/* Logo Image with responsive sizing */}
           <div className="relative">
            <img 
-  src="/src/assets/new logo.png"
+  src={img}
   alt="EduGlobe Logo"
   className="w-18 h-18 sm:w-16 sm:h-16 md:w-20 md:h-20 lg:w-25 lg:h-25 object-cover"
 onError={(e) => {
