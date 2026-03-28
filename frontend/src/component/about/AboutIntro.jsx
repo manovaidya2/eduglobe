@@ -1,5 +1,6 @@
 import React from "react";
 import SectionHeading from "../SectionHeading";
+import aboutimg from "../../assets/about-team.jpg";
 
 const AboutIntro = () => {
   return (
@@ -16,7 +17,7 @@ const AboutIntro = () => {
         </div>
         <div className="mt-6 lg:mt-0">
           <img 
-            src="/src/assets/about-team.jpg" 
+            src={aboutimg}
             alt="EduGlobe team" 
             className="rounded-xl shadow-lg w-full object-cover"
             loading="lazy"

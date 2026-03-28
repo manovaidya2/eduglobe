@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import img from "../assets/logo.webp";
+import img from "../assets/new logo.png";
 
 // Icons (replacing lucide-react)
 const MenuIcon = () => (
