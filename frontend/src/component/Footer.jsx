@@ -123,9 +123,12 @@ onError={(e) => {
                 </span>
                <span>
   <strong>Head Office:</strong><br />
-  Compass Building, Al Shohada Road,<br />
+  {/* Compass Building, Al Shohada Road,<br />
   Al Hamra Industrial Zone-FZ,<br />
-  Ras Al Khaimah, United Arab Emirates.
+  Ras Al Khaimah, United Arab Emirates. */}
+
+  EduGlobe Services FZ-LLC, Ras Al Khaimah(RAK), UAE.<br />
+  <strong>Co ordination office :</strong> Unit No. 209-04, Al Kazim, 2nd floor, Hor Alz Anz, Dubai, UAE(Near Al Qiyadah Metro Station).
   {/* <br /><br /> */}
 
   {/* <strong>Coordinating Office:</strong><br />
