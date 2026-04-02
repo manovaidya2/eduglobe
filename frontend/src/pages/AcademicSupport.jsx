@@ -7,10 +7,10 @@ import AcademicServices from "../component/academic-support/AcademicServices";
 const AcademicSupport = () => {
   return (
     <div className="min-h-screen bg-background">
-      <Navbar />
+   
       <AcademicHero />
       <AcademicServices />
-      <Footer />
+  
     </div>
   );
 };

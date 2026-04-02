@@ -7,10 +7,10 @@ import ServicesList from "../component/services/ServicesList";
 const Services = () => {
   return (
     <div className="min-h-screen bg-background">
-      <Navbar />
+
       <ServicesHero />
       <ServicesList />
-      <Footer />
+  
     </div>
   );
 };

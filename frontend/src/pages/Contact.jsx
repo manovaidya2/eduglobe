@@ -8,7 +8,7 @@ import ContactInfo from "../component/contact/ContactInfo";
 const Contact = () => {
   return (
     <div className="min-h-screen bg-background">
-      <Navbar />
+    
       <ContactHero />
       
       <section className="section-padding">
@@ -22,7 +22,7 @@ const Contact = () => {
         </div>
       </section>
       
-      <Footer />
+   
     </div>
   );
 };

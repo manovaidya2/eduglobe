@@ -11,14 +11,14 @@ import CtaSection from "../component/homepage/CtaSection";
 const Homepage = () => {
   return (
     <div className="min-h-screen bg-background">
-      <Navbar />
+  
       <Hero />
       <WhatWeDo />
       <CoreServices />
       <WhoWeServe />
       <WhyChooseUs />
       <CtaSection />
-      <Footer />
+    
     </div>
   );
 };

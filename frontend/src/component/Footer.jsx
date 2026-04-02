@@ -155,11 +155,14 @@ onError={(e) => {
         <div className="border-t border-primary-foreground/10 mt-12 pt-8 flex flex-col-reverse md:flex-row items-center justify-between gap-4 text-sm opacity-60">
   {/* Links - Mobile pe top, Desktop pe right */}
   <div className="flex gap-4 md:order-2">
-    <Link to="/" className="text-[12px] sm:text-xs md:text-sm opacity-80 hover:text-gold transition-colors duration-200">
+    <Link to="/privacy-policy" className="text-[12px] sm:text-xs md:text-sm opacity-80 hover:text-gold transition-colors duration-200">
       Privacy Policy
     </Link>
-    <Link to="/" className="text-[12px] sm:text-xs md:text-sm opacity-80 hover:text-gold transition-colors duration-200">
+    <Link to="/terms-conditions" className="text-[12px] sm:text-xs md:text-sm opacity-80 hover:text-gold transition-colors duration-200">
       Terms & Conditions
+    </Link>
+     <Link to="/refund-policy" className="text-[12px] sm:text-xs md:text-sm opacity-80 hover:text-gold transition-colors duration-200">
+      Refund Policy
     </Link>
   </div>
   

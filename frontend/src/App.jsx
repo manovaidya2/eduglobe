@@ -10,6 +10,11 @@ import Institutions from "./pages/Institutions";
 import Partners from "./pages/Partners";
 import WhyEduGlobe from "./pages/WhyEduGlobe";
 import Contact from "./pages/Contact";
+import PrivacyPolicy from "./component/ruleregulation/PrivacyPolicy";
+import Navbar from "./component/Navbar";
+import Footer from "./component/Footer";
+import TermsConditions from "./component/ruleregulation/TermsConditions";
+import RefundPolicy from "./component/ruleregulation/RefundPolicy";
 
 // ScrollToTop Component - This will scroll to top on route change
 const ScrollToTop = () => {
@@ -30,6 +35,7 @@ function App() {
   return (
     <Router>
       <ScrollToTop />
+      <Navbar />
       <Routes>
         <Route path="/" element={<Homepage />} />
         <Route path="/about" element={<About />} />
@@ -41,7 +47,11 @@ function App() {
         <Route path="/partners" element={<Partners />} />
         <Route path="/why-eduglobe" element={<WhyEduGlobe />} />
         <Route path="/contact" element={<Contact />} />
+        <Route path="/privacy-policy" element={<PrivacyPolicy />} /> 
+        <Route path="/terms-conditions" element={<TermsConditions />} /> 
+        <Route path="/refund-policy" element={<RefundPolicy />} /> 
       </Routes>
+      <Footer />
     </Router>
   );
 }

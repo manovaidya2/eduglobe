@@ -7,10 +7,10 @@ import AdmissionsServices from "../component/admissions/AdmissionsServices";
 const Admissions = () => {
   return (
     <div className="min-h-screen bg-background">
-      <Navbar />
+     
       <AdmissionsHero />
       <AdmissionsServices />
-      <Footer />
+     
     </div>
   );
 };

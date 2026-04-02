@@ -8,11 +8,11 @@ import SkillsCta from "../component/skills/SkillsCta";
 const SkillsTraining = () => {
   return (
     <div className="min-h-screen bg-background">
-      <Navbar />
+     
       <SkillsHero />
       <SkillsAreas />
       <SkillsCta />
-      <Footer />
+    
     </div>
   );
 };

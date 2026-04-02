@@ -8,11 +8,11 @@ import WhyCta from "../component/why-eduglobe/WhyCta";
 const WhyEduGlobe = () => {
   return (
     <div className="min-h-screen bg-background">
-      <Navbar />
+  
       <WhyHero />
       <Differentiators />
       <WhyCta />
-      <Footer />
+   
     </div>
   );
 };

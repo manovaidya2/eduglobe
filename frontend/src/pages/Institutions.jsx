@@ -7,10 +7,10 @@ import InstitutionsModels from "../component/institutions/InstitutionsModels";
 const Institutions = () => {
   return (
     <div className="min-h-screen bg-background">
-      <Navbar />
+   
       <InstitutionsHero />
       <InstitutionsModels />
-      <Footer />
+    
     </div>
   );
 };

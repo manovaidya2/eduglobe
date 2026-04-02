@@ -7,10 +7,10 @@ import PartnersList from "../component/partners/PartnersList";
 const Partners = () => {
   return (
     <div className="min-h-screen bg-background">
-      <Navbar />
+  
       <PartnersHero />
       <PartnersList />
-      <Footer />
+    
     </div>
   );
 };
