@@ -33,10 +33,10 @@ const contactDetails = [
     icon: MapPinIcon,
     label: "Office Location",
     value: [
-      "Head Office: Compass Building, Al Shohada Road",
-      "Al Hamra Industrial Zone-FZ, Ras Al Khaimah, UAE",
-      "Coordinating Office: Sadaf Business Centre, Al Kazim Building",
-      "Hor Al Anz East, Dubai, UAE",
+      "Head Office: EduGlobe Services FZ-LLC",
+      "Ras Al Khaimah(RAK), UAE.",
+      "Coordinating Office: Unit No. 209-04, Al Kazim, ",
+      "2nd floor, Hor Alz Anz, Dubai, UAE(Near Al Qiyadah Metro Station).",
     ],
   },
   {
