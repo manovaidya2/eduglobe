@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { Building2, ExternalLink, FileText, Download, Globe, Search, Filter, X, Eye } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { Building2, ExternalLink, FileText, Globe, Search, Filter, X, Eye } from "lucide-react";
 import axiosInstance from "../../api/axiosInstance";
 
 export default function AssociatesPage() {
@@ -8,7 +9,7 @@ export default function AssociatesPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedType, setSelectedType] = useState("all");
   const [error, setError] = useState(null);
-  const [downloading, setDownloading] = useState(null);
+  const navigate = useNavigate();
 
   // Backend base URL for file access (without /api)
   const BACKEND_URL = "https://api.eduglobe.ae";
@@ -45,56 +46,26 @@ export default function AssociatesPage() {
     return matchesSearch && matchesType;
   });
 
-  // Function to download document - Direct Download
-  const handleDownload = async (filename, uniName) => {
-    if (!filename) {
-      alert(`No document available for ${uniName}`);
-      return;
-    }
-
-    setDownloading(filename);
-    
-    try {
-      const downloadUrl = `${BACKEND_URL}/uploads/${filename}`;
-      console.log("Downloading from:", downloadUrl);
-      
-      // Using fetch to get the file and force download
-      const response = await fetch(downloadUrl);
-      const blob = await response.blob();
-      
-      // Create blob URL and trigger download
-      const blobUrl = window.URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = blobUrl;
-      link.download = filename;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      
-      // Clean up
-      window.URL.revokeObjectURL(blobUrl);
-      
-    } catch (error) {
-      console.error("Error downloading file:", error);
-      alert(`Failed to download document for ${uniName}. Please try again.`);
-    } finally {
-      setDownloading(null);
-    }
-  };
-
-  // Function to view document in new tab
-  const handleViewDocument = (filename, uniName) => {
-    if (!filename) {
-      alert(`No document available for ${uniName}`);
+  // Function to open PDF in viewer - Navigate to PDF Viewer Page with all documents
+  const handleViewDocuments = (uni) => {
+    if (!uni.documents || uni.documents.length === 0) {
+      alert(`No documents available for ${uni.name}`);
       return;
     }
     
-    const viewUrl = `${BACKEND_URL}/uploads/${filename}`;
-    window.open(viewUrl, '_blank');
+    // Navigate to PDF viewer page with all documents of the university
+    navigate('/pdf-viewer', { 
+      state: { 
+        documents: uni.documents,
+        universityName: uni.name,
+        currentIndex: 0
+      } 
+    });
   };
 
   // Function to open website
-  const handleVisitWebsite = (url, uniName) => {
+  const handleVisitWebsite = (url, uniName, e) => {
+    e.stopPropagation(); // Prevent card click when clicking on website button
     if (url && url !== "#" && url !== "") {
       window.open(url, '_blank', 'noopener,noreferrer');
     } else {
@@ -157,57 +128,56 @@ export default function AssociatesPage() {
           </p>
         </div>
 
-        {/* Search and Filter Section - Single row on desktop, stack on mobile */}
-       {/* Search and Filter Section - Always in a single row */}
-<div className="bg-white rounded-xl shadow-md p-4 sm:p-6 mb-8">
-  <div className="flex flex-row gap-4">
-    {/* Search Bar - takes remaining space */}
-    <div className="flex-1 relative">
-      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
-      <input
-        type="text"
-        placeholder="Search by university name or location..."
-        value={searchTerm}
-        onChange={(e) => setSearchTerm(e.target.value)}
-        className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00D4FF] focus:border-transparent outline-none transition"
-      />
-    </div>
+        {/* Search and Filter Section - Always in a single row */}
+        <div className="bg-white rounded-xl shadow-md p-4 sm:p-6 mb-8">
+          <div className="flex flex-row gap-4">
+            {/* Search Bar - takes remaining space */}
+            <div className="flex-1 relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+              <input
+                type="text"
+                placeholder="Search by university name or location..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00D4FF] focus:border-transparent outline-none transition"
+              />
+            </div>
 
-    {/* Filter Dropdown - fixed width */}
-    <div className="relative w-[220px]">
-      <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
-      <select
-        value={selectedType}
-        onChange={(e) => setSelectedType(e.target.value)}
-        className="w-full pl-10 pr-8 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00D4FF] focus:border-transparent outline-none appearance-none bg-white transition"
-      >
-        {universityTypes.map((type, index) => (
-          <option key={index} value={type}>
-            {type === "all" ? "All Types" : type}
-          </option>
-        ))}
-      </select>
-    </div>
+            {/* Filter Dropdown - fixed width */}
+            <div className="relative w-[220px]">
+              <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+              <select
+                value={selectedType}
+                onChange={(e) => setSelectedType(e.target.value)}
+                className="w-full pl-10 pr-8 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00D4FF] focus:border-transparent outline-none appearance-none bg-white transition"
+              >
+                {universityTypes.map((type, index) => (
+                  <option key={index} value={type}>
+                    {type === "all" ? "All Types" : type}
+                  </option>
+                ))}
+              </select>
+            </div>
 
-    {/* Clear Filters Button - only shows when filters active */}
-    {(searchTerm || selectedType !== "all") && (
-      <button
-        onClick={clearFilters}
-        className="flex items-center justify-center gap-2 px-4 py-2.5 text-gray-600 hover:text-gray-800 border border-gray-300 rounded-lg hover:bg-gray-50 transition duration-300 whitespace-nowrap"
-      >
-        <X size={16} />
-        <span className="hidden sm:inline">Clear Filters</span>
-      </button>
-    )}
-  </div>
+            {/* Clear Filters Button - only shows when filters active */}
+            {(searchTerm || selectedType !== "all") && (
+              <button
+                onClick={clearFilters}
+                className="flex items-center justify-center gap-2 px-4 py-2.5 text-gray-600 hover:text-gray-800 border border-gray-300 rounded-lg hover:bg-gray-50 transition duration-300 whitespace-nowrap"
+              >
+                <X size={16} />
+                <span className="hidden sm:inline">Clear Filters</span>
+              </button>
+            )}
+          </div>
 
-  {/* Search Results Count */}
-  {(searchTerm || selectedType !== "all") && (
-    <p className="text-sm text-gray-500 mt-3 text-center sm:text-left">
-      Found {filteredUniversities.length} university{filteredUniversities.length !== 1 ? 's' : ''}
-    </p>
-  )}
-</div>
+          {/* Search Results Count */}
+          {(searchTerm || selectedType !== "all") && (
+            <p className="text-sm text-gray-500 mt-3 text-center sm:text-left">
+              Found {filteredUniversities.length} university{filteredUniversities.length !== 1 ? 's' : ''}
+            </p>
+          )}
+        </div>
 
         {/* UNIVERSITY CARDS - Responsive Grid */}
         {filteredUniversities.length === 0 ? (
@@ -227,7 +197,8 @@ export default function AssociatesPage() {
               {filteredUniversities.map((uni, idx) => (
                 <div 
                   key={uni._id || idx} 
-                  className="bg-white rounded-xl border border-gray-200 shadow-sm hover:shadow-xl transition-all duration-300 hover:border-[#00D4FF]/30 overflow-hidden group"
+                  onClick={() => handleViewDocuments(uni)}
+                  className="bg-white rounded-xl border border-gray-200 shadow-sm hover:shadow-xl transition-all duration-300 hover:border-[#00D4FF]/30 overflow-hidden group cursor-pointer"
                 >
                   <div className="p-4 sm:p-5">
                     {/* University Header */}
@@ -263,44 +234,14 @@ export default function AssociatesPage() {
                       </div>
                     </div>
 
-                    {/* Documents Section */}
+                    {/* Documents Count Badge */}
                     {uni.documents && uni.documents.length > 0 ? (
                       <div className="mt-4 pt-3 border-t border-gray-100">
-                        <p className="text-xs font-medium text-gray-500 mb-2 flex items-center gap-1">
-                          <FileText size={12} /> Documents ({uni.documents.length})
-                        </p>
-                        <div className="flex flex-col gap-2">
-                          {uni.documents.slice(0, 2).map((doc, docIndex) => (
-                            <div key={docIndex} className="flex gap-2">
-                              <button
-                                onClick={() => handleDownload(doc, uni.name)}
-                                disabled={downloading === doc}
-                                className="flex-1 flex items-center justify-between text-xs sm:text-sm bg-gray-50 hover:bg-[#00D4FF]/10 px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg transition group/download"
-                              >
-                                <span className="flex items-center gap-1 sm:gap-2 flex-1 min-w-0">
-                                  <Download size={12} className="text-[red] flex-shrink-0" />
-                                  <span className="text-gray-700 truncate">
-                                    {downloading === doc ? 'Downloading...' : (doc.length > 25 ? doc.substring(0, 25) + '...' : doc)}
-                                  </span>
-                                </span>
-                                <span className="text-xs text-gray-400 group-hover/download:text-[red] flex-shrink-0 ml-1 sm:ml-2">
-                                  Download
-                                </span>
-                              </button>
-                              <button
-                                onClick={() => handleViewDocument(doc, uni.name)}
-                                className="px-2 sm:px-3 py-1.5 sm:py-2 bg-gray-50 hover:bg-[red]/10 rounded-lg transition group/view"
-                                title="View Document"
-                              >
-                                <Eye size={12} className="text-[red] sm:w-5 sm:h-5" />
-                              </button>
-                            </div>
-                          ))}
-                          {uni.documents.length > 2 && (
-                            <p className="text-xs text-gray-400 text-center">
-                              +{uni.documents.length - 2} more documents
-                            </p>
-                          )}
+                        <div className="flex items-center justify-center gap-2 text-sm text-gray-600">
+                          <FileText size={14} className="text-[red]" />
+                          <span>{uni.documents.length} Document{uni.documents.length !== 1 ? 's' : ''} Available</span>
+                          <Eye size={14} className="text-[red] ml-2" />
+                          <span className="text-xs text-gray-400">Click to view</span>
                         </div>
                       </div>
                     ) : (
@@ -313,7 +254,7 @@ export default function AssociatesPage() {
 
                     {/* Website Button */}
                     <button
-                      onClick={() => handleVisitWebsite(uni.website, uni.name)}
+                      onClick={(e) => handleVisitWebsite(uni.website, uni.name, e)}
                       className="mt-4 w-full flex items-center justify-center gap-2 text-xs sm:text-sm bg-gradient-to-r from-[red] to-[red] text-white px-3 py-2 rounded-lg hover:shadow-lg transition-all duration-300 transform hover:scale-105"
                     >
                       <Globe size={14} />
@@ -328,8 +269,22 @@ export default function AssociatesPage() {
         )}
 
         {/* Stats Footer */}
-       
-  
+        <div className="mt-10 sm:mt-12 text-center">
+          <div className="bg-white rounded-lg shadow-md p-4 sm:p-6">
+            <p className="text-gray-600 text-sm sm:text-base">
+              Showing <span className="font-semibold text-[#00D4FF]">{filteredUniversities.length}</span> of <span className="font-semibold">{universities.length}</span> associated universities
+            </p>
+            <button
+              onClick={fetchUniversities}
+              className="mt-3 text-[#00D4FF] text-sm hover:underline inline-flex items-center gap-1 transition"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+              </svg>
+              Refresh List
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   );
