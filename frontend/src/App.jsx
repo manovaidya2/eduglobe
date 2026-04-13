@@ -15,6 +15,7 @@ import Navbar from "./component/Navbar";
 import Footer from "./component/Footer";
 import TermsConditions from "./component/ruleregulation/TermsConditions";
 import RefundPolicy from "./component/ruleregulation/RefundPolicy";
+import AssociatesPage from "./component/services/AssociatesPage";
 
 // ScrollToTop Component - This will scroll to top on route change
 const ScrollToTop = () => {
@@ -50,6 +51,7 @@ function App() {
         <Route path="/privacy-policy" element={<PrivacyPolicy />} /> 
         <Route path="/terms-conditions" element={<TermsConditions />} /> 
         <Route path="/refund-policy" element={<RefundPolicy />} /> 
+        <Route path="/associates" element={<AssociatesPage />} /> {/* Fallback route for undefined paths */}
       </Routes>
       <Footer />
     </Router>

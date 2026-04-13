@@ -1,9 +1,10 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import SectionHeading from "../SectionHeading";
 import Button from "../Button";
+import axiosInstance from "../../api/axiosInstance";
 
-// Custom Icons (same as before)
+// Custom Icons (keeping your existing icons)
 const BuildingIcon = () => (
   <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <rect x="4" y="2" width="16" height="20" rx="2" ry="2"></rect>
@@ -56,6 +57,13 @@ const DollarIcon = () => (
   <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <line x1="12" y1="1" x2="12" y2="23"></line>
     <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+  </svg>
+);
+
+const GraduationCapIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M22 10v6M2 10l10-5 10 5-10 5z"/>
+    <path d="M6 12v5c0 2 2 3 6 3s6-1 6-3v-5"/>
   </svg>
 );
 
@@ -147,8 +155,100 @@ const servicesList = [
 ];
 
 const ServicesList = () => {
+  const [associatesCount, setAssociatesCount] = useState(0);
+  const [aspiratesCount, setAspiratesCount] = useState(0);
+  const [loading, setLoading] = useState(true);
+
+  // Fetch counts from API
+  useEffect(() => {
+    fetchCounts();
+  }, []);
+
+  const fetchCounts = async () => {
+    try {
+      setLoading(true);
+      // Fetch associates count
+      const associatesResponse = await axiosInstance.get("/associates");
+      setAssociatesCount(associatesResponse.data.data?.length || 0);
+
+      // Fetch aspirates count
+      try {
+        const aspiratesResponse = await axiosInstance.get("/aspirates");
+        setAspiratesCount(aspiratesResponse.data.data?.length || 0);
+      } catch (error) {
+        // Fallback to static count if endpoint doesn't exist
+        setAspiratesCount(150);
+      }
+    } catch (error) {
+      console.error("Error fetching counts:", error);
+      setAssociatesCount(50);
+      setAspiratesCount(150);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
-    <section className="section-padding">
+    <>
+      {/* Two Cards Row - Associates and Aspirates */}
+      <div className="container ">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 py-6">
+          {/* Associates Card - Fully Clickable */}
+          <Link 
+            to="/associates" 
+            className="block bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl p-6 border border-blue-100 shadow-lg hover:shadow-xl transition-all duration-300 group cursor-pointer"
+          >
+            <div className="flex items-start justify-between mb-4">
+              <div className="w-16 h-16 rounded-xl bg-blue-600/10 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                <BuildingIcon />
+              </div>
+              <div className="text-right">
+                <p className="text-sm text-gray-500 font-medium">Total Partners</p>
+                <p className="text-3xl font-bold text-blue-600">
+                  {loading ? "..." : `${associatesCount}+`}
+                </p>
+              </div>
+            </div>
+            <h3 className="text-xl font-bold text-gray-800 mb-2 group-hover:text-blue-600 transition-colors">Our Associates</h3>
+            <p className="text-gray-600 mb-4">
+              We have partnered with {associatesCount}+ prestigious universities and institutions across India to provide quality education and global opportunities.
+            </p>
+            <div className="inline-flex items-center gap-2 text-blue-600 font-semibold group-hover:gap-3 transition-all duration-300">
+              View All Associates
+              <ArrowRightIcon />
+            </div>
+          </Link>
+
+          {/* Aspirates Card - Fully Clickable */}
+          <Link 
+            to="/aspirates" 
+            className="block bg-gradient-to-br from-purple-50 to-pink-50 rounded-2xl p-6 border border-purple-100 shadow-lg hover:shadow-xl transition-all duration-300 group cursor-pointer"
+          >
+            <div className="flex items-start justify-between mb-4">
+              <div className="w-16 h-16 rounded-xl bg-purple-600/10 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                <GraduationCapIcon />
+              </div>
+              <div className="text-right">
+                <p className="text-sm text-gray-500 font-medium">Active Students</p>
+                <p className="text-3xl font-bold text-purple-600">
+                  {loading ? "..." : `${aspiratesCount}+`}
+                </p>
+              </div>
+            </div>
+            <h3 className="text-xl font-bold text-gray-800 mb-2 group-hover:text-purple-600 transition-colors">Our Aspirates</h3>
+            <p className="text-gray-600 mb-4">
+              Join {aspiratesCount}+ successful students who have achieved their academic goals through our guidance and support services.
+            </p>
+            <div className="inline-flex items-center gap-2 text-purple-600 font-semibold group-hover:gap-3 transition-all duration-300">
+              Join as Aspirate
+              <ArrowRightIcon />
+            </div>
+          </Link>
+        </div>
+      </div>
+
+      {/* Services List Section */}
+      <section className="section-padding">
         <div className="container space-y-6 md:space-y-8">
           {servicesList.map((service, index) => {
             const IconComponent = service.icon;
@@ -176,8 +276,8 @@ const ServicesList = () => {
                       {service.items.map((item) => (
                         <li key={item} className="flex items-start gap-2 text-sm sm:text-base text-muted-foreground transition-all duration-300 group-hover:text-foreground">
                           <span className="text-accent mt-0.5 shrink-0 transition-all duration-300 group-hover:scale-110 group-hover:text-primary">
-                  <CheckIcon />
-                </span>
+                            <CheckIcon />
+                          </span>
                           <span className="leading-relaxed">{item}</span>
                         </li>
                       ))}
@@ -189,6 +289,7 @@ const ServicesList = () => {
           })}
         </div>
       </section>
+    </>
   );
 };
 
