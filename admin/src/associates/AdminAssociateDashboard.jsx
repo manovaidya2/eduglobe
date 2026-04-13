@@ -190,7 +190,7 @@ export default function AdminAssociateDashboard() {
                     <td className="px-6 py-4 whitespace-nowrap">
                       {associate.logo ? (
                         <img
-                          src={`http://localhost:5003/uploads/${associate.logo}`}
+                          src={`https://api.eduglobe.ae/uploads/${associate.logo}`}
                           alt={associate.name}
                           className="h-10 w-10 object-cover rounded-full"
                           onError={(e) => {

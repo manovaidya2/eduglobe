@@ -545,7 +545,7 @@ export default function AssociatesPage() {
   const [downloading, setDownloading] = useState(null);
 
   // Backend base URL for file access (without /api)
-  const BACKEND_URL = "http://localhost:5003";
+  const BACKEND_URL = "https://api.eduglobe.ae";
 
   // Fetch universities from API
   useEffect(() => {

@@ -183,7 +183,7 @@ export default function AdminEditUniversity() {
               Current Logo
             </label>
             <img
-              src={`http://localhost:5003/uploads/${form.existingLogo}`}
+              src={`https://api.eduglobe.ae/uploads/${form.existingLogo}`}
               alt="Current logo"
               className="h-20 w-auto object-contain border rounded p-2"
             />

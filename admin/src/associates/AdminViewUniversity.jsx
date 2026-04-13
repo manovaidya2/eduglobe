@@ -56,7 +56,7 @@ export default function AdminViewUniversity() {
               <div className="md:w-1/3">
                 {associate.logo ? (
                   <img
-                    src={`http://localhost:5003/uploads/${associate.logo}`}
+                    src={`https://api.eduglobe.ae/uploads/${associate.logo}`}
                     alt={associate.name}
                     className="w-full rounded-lg shadow-md"
                   />
@@ -117,7 +117,7 @@ export default function AdminViewUniversity() {
                   {associate.documents.map((doc, index) => (
                     <a
                       key={index}
-                      href={`http://localhost:5003/uploads/${doc}`}
+                      href={`https://api.eduglobe.ae/uploads/${doc}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="flex items-center gap-3 p-3 border rounded-lg hover:bg-gray-50 transition"
@@ -136,7 +136,7 @@ export default function AdminViewUniversity() {
             {/* Action Buttons */}
             <div className="mt-8 flex gap-3">
               <button
-                onClick={() => navigate("/admin/dashboard")}
+                onClick={() => navigate("/admin-dashboard")}
                 className="px-6 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition"
               >
                 Back to Dashboard
