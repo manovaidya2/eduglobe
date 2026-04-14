@@ -13,6 +13,7 @@ export default function AssociatesPage() {
 
   // Backend base URL for file access (without /api)
   const BACKEND_URL = "https://api.eduglobe.ae";
+  //  const BACKEND_URL = "http://localhost:5009";
 
   // Fetch universities from API
   useEffect(() => {
@@ -48,19 +49,7 @@ export default function AssociatesPage() {
 
   // Function to open PDF in viewer - Navigate to PDF Viewer Page with all documents
   const handleViewDocuments = (uni) => {
-    if (!uni.documents || uni.documents.length === 0) {
-      alert(`No documents available for ${uni.name}`);
-      return;
-    }
-    
-    // Navigate to PDF viewer page with all documents of the university
-    navigate('/pdf-viewer', { 
-      state: { 
-        documents: uni.documents,
-        universityName: uni.name,
-        currentIndex: 0
-      } 
-    });
+   navigate(`/associates/${uni._id}`);
   };
 
   // Function to open website

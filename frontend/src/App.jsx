@@ -17,6 +17,7 @@ import TermsConditions from "./component/ruleregulation/TermsConditions";
 import RefundPolicy from "./component/ruleregulation/RefundPolicy";
 import AssociatesPage from "./component/services/AssociatesPage";
 import PdfViewer from "./component/services/PdfViewer";
+import UniversityDetail from './pages/UniversityDetail';
 
 // ScrollToTop Component - This will scroll to top on route change
 const ScrollToTop = () => {
@@ -54,6 +55,8 @@ function App() {
         <Route path="/refund-policy" element={<RefundPolicy />} /> 
         <Route path="/associates" element={<AssociatesPage />} />
          <Route path="/pdf-viewer" element={<PdfViewer />} />
+         <Route path="/associates/:id" element={<UniversityDetail />} />
+         
       </Routes>
       <Footer />
     </Router>

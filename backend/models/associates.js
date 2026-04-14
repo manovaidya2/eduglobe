@@ -7,7 +7,18 @@ const associatesSchema = new mongoose.Schema(
     type: String,
     website: String,
     logo: String,
-    documents: [String],
+    details: [
+      {
+        heading: String,
+        description: String,
+      },
+    ],
+    documents: [
+      {
+        name: String,
+        file: String,
+      },
+    ],
   },
   { timestamps: true }
 );

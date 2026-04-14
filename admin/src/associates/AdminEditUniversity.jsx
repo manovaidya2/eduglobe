@@ -14,7 +14,8 @@ export default function AdminEditUniversity() {
     website: "",
     logo: null,
     existingLogo: "",
-    documents: [],
+    details: [],
+    newDocuments: [{ name: "", file: null }],
     existingDocuments: [],
   });
 
@@ -33,7 +34,12 @@ export default function AdminEditUniversity() {
         website: data.website || "",
         logo: null,
         existingLogo: data.logo || "",
-        documents: [],
+        // details array backend se aayega — [{heading, description}]
+        details: data.details?.length
+          ? data.details
+          : [{ heading: "", description: "" }],
+        newDocuments: [{ name: "", file: null }],
+        // existingDocuments ab objects hain — [{name, url/path}]
         existingDocuments: data.documents || [],
       });
     } catch (error) {
@@ -45,38 +51,42 @@ export default function AdminEditUniversity() {
     }
   };
 
-  const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+  const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
+  const handleLogoChange = (e) => setForm({ ...form, logo: e.target.files[0] || null });
+
+  // Details handlers
+  const addDetail = () =>
+    setForm({ ...form, details: [...form.details, { heading: "", description: "" }] });
+  const removeDetail = (i) =>
+    setForm({ ...form, details: form.details.filter((_, idx) => idx !== i) });
+  const handleDetailChange = (i, field, value) => {
+    const updated = [...form.details];
+    updated[i] = { ...updated[i], [field]: value };
+    setForm({ ...form, details: updated });
   };
 
-  const handleLogoChange = (e) => {
-    setForm({ ...form, logo: e.target.files[0] || null });
+  // New document handlers
+  const addNewDocument = () =>
+    setForm({ ...form, newDocuments: [...form.newDocuments, { name: "", file: null }] });
+  const removeNewDocument = (i) =>
+    setForm({ ...form, newDocuments: form.newDocuments.filter((_, idx) => idx !== i) });
+  const handleNewDocChange = (i, field, value) => {
+    const updated = [...form.newDocuments];
+    updated[i] = { ...updated[i], [field]: value };
+    setForm({ ...form, newDocuments: updated });
   };
 
-  const handleDocChange = (index, file) => {
-    const updatedDocs = [...form.documents];
-    updatedDocs[index] = file;
-    setForm({ ...form, documents: updatedDocs });
-  };
-
-  const addDocumentField = () => {
-    setForm({ ...form, documents: [...form.documents, null] });
-  };
-
-  const removeDocument = (index) => {
-    const updatedDocs = form.documents.filter((_, i) => i !== index);
-    setForm({ ...form, documents: updatedDocs });
-  };
-
+  // Existing document delete
   const removeExistingDocument = async (docIndex, docName) => {
     if (window.confirm(`Delete "${docName}"?`)) {
       try {
         await axiosInstance.delete(`/associates/${id}/documents/${docIndex}`);
-        const updatedDocs = form.existingDocuments.filter((_, i) => i !== docIndex);
-        setForm({ ...form, existingDocuments: updatedDocs });
+        setForm({
+          ...form,
+          existingDocuments: form.existingDocuments.filter((_, i) => i !== docIndex),
+        });
         alert("Document deleted successfully");
       } catch (error) {
-        console.error("Error deleting document:", error);
         alert("Failed to delete document");
       }
     }
@@ -85,34 +95,33 @@ export default function AdminEditUniversity() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-
     try {
       const formData = new FormData();
       formData.append("name", form.name);
       formData.append("location", form.location);
       formData.append("type", form.type);
       formData.append("website", form.website);
+      if (form.logo) formData.append("logo", form.logo);
 
-      if (form.logo) {
-        formData.append("logo", form.logo);
-      }
+      formData.append(
+        "details",
+        JSON.stringify(form.details.filter((d) => d.heading.trim()))
+      );
 
-      form.documents.forEach((doc) => {
-        if (doc) {
-          formData.append("documents", doc);
+      form.newDocuments.forEach((doc) => {
+        if (doc.file) {
+          formData.append("documentNames", doc.name);
+          formData.append("documents", doc.file);
         }
       });
 
       await axiosInstance.put(`/associates/${id}`, formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
+        headers: { "Content-Type": "multipart/form-data" },
       });
 
       alert("Associate updated successfully ✅");
       navigate("/admin/dashboard");
     } catch (err) {
-      console.error(err);
       alert(err?.response?.data?.message || "Something went wrong");
     } finally {
       setLoading(false);
@@ -131,57 +140,32 @@ export default function AdminEditUniversity() {
     <div className="min-h-screen bg-gray-100 flex items-center justify-center p-6">
       <form
         onSubmit={handleSubmit}
-        className="bg-white shadow-xl rounded-2xl p-6 w-full max-w-1xl space-y-5"
+        className="bg-white shadow-xl rounded-2xl p-6 w-full max-w-2xl space-y-5"
       >
-        <h2 className="text-2xl font-bold text-gray-800 text-center">
-          Edit Associate
-        </h2>
+        <h2 className="text-2xl font-bold text-gray-800 text-center">Edit Associate</h2>
 
-        <input
-          type="text"
-          name="name"
-          placeholder="University Name"
-          value={form.name}
+        {/* Basic Fields */}
+        <input type="text" name="name" placeholder="University Name" value={form.name}
           onChange={handleChange}
-          className="w-full border border-gray-300 p-2 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
-          required
-        />
+          className="w-full border border-gray-300 p-2 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" required />
 
-        <input
-          type="text"
-          name="location"
-          placeholder="Location"
-          value={form.location}
+        <div className="grid grid-cols-2 gap-3">
+          <input type="text" name="location" placeholder="Location" value={form.location}
+            onChange={handleChange}
+            className="border border-gray-300 p-2 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" required />
+          <input type="text" name="type" placeholder="Type (Private/Government)" value={form.type}
+            onChange={handleChange}
+            className="border border-gray-300 p-2 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" required />
+        </div>
+
+        <input type="text" name="website" placeholder="Website URL" value={form.website}
           onChange={handleChange}
-          className="w-full border border-gray-300 p-2 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
-          required
-        />
+          className="w-full border border-gray-300 p-2 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" />
 
-        <input
-          type="text"
-          name="type"
-          placeholder="Type (Private/Government)"
-          value={form.type}
-          onChange={handleChange}
-          className="w-full border border-gray-300 p-2 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
-          required
-        />
-
-        <input
-          type="text"
-          name="website"
-          placeholder="Website URL"
-          value={form.website}
-          onChange={handleChange}
-          className="w-full border border-gray-300 p-2 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
-        />
-
-        {/* Current Logo Display */}
+        {/* Logo */}
         {form.existingLogo && (
           <div>
-            <label className="block font-medium text-gray-700 mb-1">
-              Current Logo
-            </label>
+            <label className="block font-medium text-gray-700 mb-1">Current Logo</label>
             <img
               src={`https://api.eduglobe.ae/uploads/${form.existingLogo}`}
               alt="Current logo"
@@ -189,41 +173,69 @@ export default function AdminEditUniversity() {
             />
           </div>
         )}
-
         <div>
           <label className="block font-medium text-gray-700 mb-1">
-            Change Logo (Optional)
+            {form.existingLogo ? "Change Logo (Optional)" : "Upload Logo"}
           </label>
-          <input
-            type="file"
-            accept="image/*"
-            onChange={handleLogoChange}
-            className="w-full border p-2 rounded-lg bg-gray-50"
-          />
+          <input type="file" accept="image/*" onChange={handleLogoChange}
+            className="w-full border p-2 rounded-lg bg-gray-50" />
           {form.logo && (
-            <p className="text-sm text-green-600 mt-1">
-              New selected: {form.logo.name}
-            </p>
+            <p className="text-sm text-green-600 mt-1">New selected: {form.logo.name}</p>
           )}
         </div>
 
-        {/* Existing Documents */}
+        {/* ── University Details ── */}
+        <div>
+          <div className="flex items-center justify-between mb-2">
+            <label className="font-medium text-gray-700">University Details</label>
+            <button type="button" onClick={addDetail}
+              className="text-blue-600 font-medium hover:underline text-sm">+ Add Heading</button>
+          </div>
+          {form.details.map((detail, i) => (
+            <div key={i} className="border border-gray-200 rounded-lg p-3 mb-3 bg-gray-50 relative">
+              {form.details.length > 1 && (
+                <button type="button" onClick={() => removeDetail(i)}
+                  className="absolute top-2 right-2 bg-red-100 text-red-600 text-xs px-2 py-1 rounded">✕</button>
+              )}
+              <input type="text" placeholder="Heading (e.g. About the University)"
+                value={detail.heading}
+                onChange={(e) => handleDetailChange(i, "heading", e.target.value)}
+                className="w-full border border-gray-300 p-2 rounded-lg outline-none focus:ring-2 focus:ring-blue-500 mb-2" />
+              <textarea placeholder="Description..."
+                value={detail.description}
+                onChange={(e) => handleDetailChange(i, "description", e.target.value)}
+                className="w-full border border-gray-300 p-2 rounded-lg outline-none focus:ring-2 focus:ring-blue-500 resize-y min-h-[80px]" />
+            </div>
+          ))}
+        </div>
+
+        {/* ── Existing Documents ── */}
         {form.existingDocuments.length > 0 && (
           <div>
             <label className="block font-medium text-gray-700 mb-2">
               Current Documents ({form.existingDocuments.length})
             </label>
             <div className="space-y-2">
-              {form.existingDocuments.map((doc, index) => (
-                <div key={index} className="flex items-center justify-between bg-gray-50 p-2 rounded">
-                  <span className="text-sm text-gray-600 truncate flex-1">
-                    📄 {doc}
+              {form.existingDocuments.map((doc, i) => (
+                <div key={i}
+                  className="flex items-center gap-3 border border-gray-200 rounded-lg p-3 bg-gray-50">
+                  {/* PDF Icon */}
+                  <div className="w-9 h-11 bg-blue-50 rounded flex items-center justify-center flex-shrink-0">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                      <rect x="4" y="2" width="12" height="18" rx="2" fill="#4285f4" opacity=".2"/>
+                      <rect x="4" y="2" width="12" height="18" rx="2" stroke="#4285f4" strokeWidth="1.2"/>
+                      <path d="M8 8h6M8 11h6M8 14h4" stroke="#4285f4" strokeWidth="1.2" strokeLinecap="round"/>
+                      <rect x="13" y="14" width="7" height="7" rx="1.5" fill="#e53935"/>
+                      <path d="M15.5 17.5h3M17 16v3" stroke="white" strokeWidth="1.2" strokeLinecap="round"/>
+                    </svg>
+                  </div>
+                  <span className="flex-1 text-sm text-gray-700 truncate">
+                    {/* doc agar object hai to doc.name, agar string hai to doc */}
+                    {typeof doc === "object" ? doc.name : doc}
                   </span>
-                  <button
-                    type="button"
-                    onClick={() => removeExistingDocument(index, doc)}
-                    className="bg-red-500 text-white px-3 py-1 rounded-lg hover:bg-red-600 text-sm"
-                  >
+                  <button type="button"
+                    onClick={() => removeExistingDocument(i, typeof doc === "object" ? doc.name : doc)}
+                    className="bg-red-100 text-red-600 text-xs px-3 py-1.5 rounded-lg hover:bg-red-200">
                     Delete
                   </button>
                 </div>
@@ -232,52 +244,55 @@ export default function AdminEditUniversity() {
           </div>
         )}
 
-        {/* Add New Documents */}
+        {/* ── Add New Documents ── */}
         <div>
-          <label className="block font-medium text-gray-700 mb-2">
-            Add New Documents (PDF)
-          </label>
-
-          {form.documents.map((doc, index) => (
-            <div key={index} className="flex items-center gap-2 mb-2">
-              <input
-                type="file"
-                accept="application/pdf"
-                onChange={(e) => handleDocChange(index, e.target.files[0])}
-                className="w-full border p-2 rounded-lg bg-gray-50"
-              />
-              <button
-                type="button"
-                onClick={() => removeDocument(index)}
-                className="bg-red-500 text-white px-3 py-1 rounded-lg hover:bg-red-600"
-              >
-                ✕
-              </button>
+          <div className="flex items-center justify-between mb-2">
+            <label className="font-medium text-gray-700">Add New Documents (PDF)</label>
+            <button type="button" onClick={addNewDocument}
+              className="text-blue-600 font-medium hover:underline text-sm">+ Add Document</button>
+          </div>
+          {form.newDocuments.map((doc, i) => (
+            <div key={i}
+              className="flex items-center gap-3 border border-gray-200 rounded-lg p-3 mb-2 bg-gray-50">
+              <div className="w-9 h-11 bg-blue-50 rounded flex items-center justify-center flex-shrink-0">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                  <rect x="4" y="2" width="12" height="18" rx="2" fill="#4285f4" opacity=".2"/>
+                  <rect x="4" y="2" width="12" height="18" rx="2" stroke="#4285f4" strokeWidth="1.2"/>
+                  <path d="M8 8h6M8 11h6M8 14h4" stroke="#4285f4" strokeWidth="1.2" strokeLinecap="round"/>
+                  <rect x="13" y="14" width="7" height="7" rx="1.5" fill="#e53935"/>
+                  <path d="M15.5 17.5h3M17 16v3" stroke="white" strokeWidth="1.2" strokeLinecap="round"/>
+                </svg>
+              </div>
+              <div className="flex-1 space-y-1">
+                <input type="text" placeholder="Document name (e.g. Application Form)"
+                  value={doc.name}
+                  onChange={(e) => handleNewDocChange(i, "name", e.target.value)}
+                  className="w-full border border-gray-300 p-1.5 rounded text-sm outline-none focus:ring-2 focus:ring-blue-400" />
+                <div className="flex items-center gap-2">
+                  <span className="text-xs text-gray-500 flex-1 truncate">
+                    {doc.file ? doc.file.name : "No file chosen"}
+                  </span>
+                  <label className="text-xs border border-gray-300 px-3 py-1 rounded cursor-pointer hover:bg-gray-100">
+                    Choose PDF
+                    <input type="file" accept="application/pdf" className="hidden"
+                      onChange={(e) => handleNewDocChange(i, "file", e.target.files[0] || null)} />
+                  </label>
+                </div>
+              </div>
+              <button type="button" onClick={() => removeNewDocument(i)}
+                className="text-red-500 text-lg leading-none px-1">✕</button>
             </div>
           ))}
-
-          <button
-            type="button"
-            onClick={addDocumentField}
-            className="mt-2 text-blue-600 font-medium hover:underline"
-          >
-            ➕ Add More Documents
-          </button>
         </div>
 
+        {/* Action Buttons */}
         <div className="flex gap-3">
-          <button
-            type="button"
-            onClick={() => navigate("/admin/dashboard")}
-            className="flex-1 bg-gray-500 text-white py-2 rounded-lg font-semibold hover:bg-gray-600 transition"
-          >
+          <button type="button" onClick={() => navigate("/admin/dashboard")}
+            className="flex-1 bg-gray-500 text-white py-2 rounded-lg font-semibold hover:bg-gray-600 transition">
             Cancel
           </button>
-          <button
-            type="submit"
-            disabled={loading}
-            className="flex-1 bg-blue-600 text-white py-2 rounded-lg font-semibold hover:bg-blue-700 transition disabled:opacity-50"
-          >
+          <button type="submit" disabled={loading}
+            className="flex-1 bg-blue-600 text-white py-2 rounded-lg font-semibold hover:bg-blue-700 transition disabled:opacity-50">
             {loading ? "Updating..." : "Update Associate"}
           </button>
         </div>

@@ -6,7 +6,7 @@ import { fileURLToPath } from "url";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Create - Existing code
+// Create
 export const createAssociates = async (req, res) => {
   try {
     const { name, location, type, website } = req.body;
@@ -16,9 +16,29 @@ export const createAssociates = async (req, res) => {
       logo = req.files.logo[0].filename;
     }
 
+    // Details: JSON string se parse karo
+    let details = [];
+    if (req.body.details) {
+      try {
+        details = JSON.parse(req.body.details);
+      } catch {
+        details = [];
+      }
+    }
+
+    // Documents: name aur file dono match karo by index
     let documents = [];
     if (req.files?.documents) {
-      documents = req.files.documents.map((file) => file.filename);
+      const documentNames = Array.isArray(req.body.documentNames)
+        ? req.body.documentNames
+        : req.body.documentNames
+        ? [req.body.documentNames]
+        : [];
+
+      documents = req.files.documents.map((file, index) => ({
+        name: documentNames[index] || file.originalname,
+        file: file.filename,
+      }));
     }
 
     const newAssociates = new Associates({
@@ -27,6 +47,7 @@ export const createAssociates = async (req, res) => {
       type,
       website,
       logo,
+      details,
       documents,
     });
 
@@ -87,36 +108,46 @@ export const updateAssociate = async (req, res) => {
       return res.status(404).json({ message: "Associate not found" });
     }
 
-    // Handle logo update
+    // Logo handle
     let logo = existingAssociate.logo;
     if (req.files?.logo) {
-      // Delete old logo if exists
       if (existingAssociate.logo) {
         const oldLogoPath = path.join(__dirname, "../uploads", existingAssociate.logo);
-        if (fs.existsSync(oldLogoPath)) {
-          fs.unlinkSync(oldLogoPath);
-        }
+        if (fs.existsSync(oldLogoPath)) fs.unlinkSync(oldLogoPath);
       }
       logo = req.files.logo[0].filename;
     }
 
-    // Handle documents update
+    // Details update
+    let details = existingAssociate.details;
+    if (req.body.details) {
+      try {
+        details = JSON.parse(req.body.details);
+      } catch {
+        details = existingAssociate.details;
+      }
+    }
+
+    // Naye documents existing mein append karo
     let documents = existingAssociate.documents;
     if (req.files?.documents && req.files.documents.length > 0) {
-      const newDocuments = req.files.documents.map((file) => file.filename);
+      const documentNames = Array.isArray(req.body.documentNames)
+        ? req.body.documentNames
+        : req.body.documentNames
+        ? [req.body.documentNames]
+        : [];
+
+      const newDocuments = req.files.documents.map((file, index) => ({
+        name: documentNames[index] || file.originalname,
+        file: file.filename,
+      }));
+
       documents = [...documents, ...newDocuments];
     }
 
     const updatedAssociate = await Associates.findByIdAndUpdate(
       id,
-      {
-        name,
-        location,
-        type,
-        website,
-        logo,
-        documents,
-      },
+      { name, location, type, website, logo, details, documents },
       { new: true, runValidators: true }
     );
 
@@ -130,7 +161,7 @@ export const updateAssociate = async (req, res) => {
   }
 };
 
-// Delete single document from associate
+// Delete single document by docIndex
 export const deleteDocument = async (req, res) => {
   try {
     const { id, docIndex } = req.params;
@@ -140,17 +171,12 @@ export const deleteDocument = async (req, res) => {
       return res.status(404).json({ message: "Associate not found" });
     }
 
-    // Get the document filename
     const docToDelete = associate.documents[docIndex];
-    if (docToDelete) {
-      // Delete file from uploads folder
-      const docPath = path.join(__dirname, "../uploads", docToDelete);
-      if (fs.existsSync(docPath)) {
-        fs.unlinkSync(docPath);
-      }
+    if (docToDelete?.file) {
+      const docPath = path.join(__dirname, "../uploads", docToDelete.file);
+      if (fs.existsSync(docPath)) fs.unlinkSync(docPath);
     }
 
-    // Remove document from array
     associate.documents.splice(docIndex, 1);
     await associate.save();
 
@@ -174,28 +200,22 @@ export const deleteAssociate = async (req, res) => {
       return res.status(404).json({ message: "Associate not found" });
     }
 
-    // Delete logo file
     if (associate.logo) {
       const logoPath = path.join(__dirname, "../uploads", associate.logo);
-      if (fs.existsSync(logoPath)) {
-        fs.unlinkSync(logoPath);
-      }
+      if (fs.existsSync(logoPath)) fs.unlinkSync(logoPath);
     }
 
-    // Delete all document files
+    // Ab documents objects hain — file property se path lena hai
     associate.documents.forEach((doc) => {
-      const docPath = path.join(__dirname, "../uploads", doc);
-      if (fs.existsSync(docPath)) {
-        fs.unlinkSync(docPath);
+      if (doc?.file) {
+        const docPath = path.join(__dirname, "../uploads", doc.file);
+        if (fs.existsSync(docPath)) fs.unlinkSync(docPath);
       }
     });
 
-    // Delete from database
     await Associates.findByIdAndDelete(id);
 
-    res.status(200).json({
-      message: "Associate deleted successfully",
-    });
+    res.status(200).json({ message: "Associate deleted successfully" });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Server Error" });

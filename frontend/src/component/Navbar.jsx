@@ -22,6 +22,7 @@ const navLinks = [
   { label: "Home", path: "/" },
   { label: "About Us", path: "/about" },
   { label: "Services", path: "/services" },
+  { label: "Associates", path: "/associates" },
   { label: "Admissions", path: "/admissions" },
   { label: "Academic Support", path: "/academic-support" },
   { label: "Skills Training", path: "/skills-training" },
