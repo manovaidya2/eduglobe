@@ -18,6 +18,7 @@ import RefundPolicy from "./component/ruleregulation/RefundPolicy";
 import AssociatesPage from "./component/services/AssociatesPage";
 import PdfViewer from "./component/services/PdfViewer";
 import UniversityDetail from './pages/UniversityDetail';
+import { HelmetProvider } from "react-helmet-async";
 
 // ScrollToTop Component - This will scroll to top on route change
 const ScrollToTop = () => {
@@ -36,6 +37,7 @@ const ScrollToTop = () => {
 
 function App() {
   return (
+      <HelmetProvider>
     <Router>
       <ScrollToTop />
       <Navbar />
@@ -60,6 +62,7 @@ function App() {
       </Routes>
       <Footer />
     </Router>
+      </HelmetProvider>
   );
 }
 

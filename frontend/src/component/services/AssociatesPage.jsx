@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Building2, ExternalLink, FileText, Globe, Search, Filter, X, Eye } from "lucide-react";
 import axiosInstance from "../../api/axiosInstance";
+import { Helmet } from "react-helmet-async";
 
 export default function AssociatesPage() {
   const [universities, setUniversities] = useState([]);
@@ -76,12 +77,18 @@ export default function AssociatesPage() {
 
   if (loading) {
     return (
+      <>
+      <Helmet>
+        <title>Associates | EduGlobe</title>
+        <meta name="description" content="Explore our network of associated universities and institutions." />
+      </Helmet>
       <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#00D4FF] mx-auto mb-4"></div>
           <p className="text-gray-600">Loading universities...</p>
         </div>
       </div>
+      </>
     );
   }
 
@@ -109,7 +116,7 @@ export default function AssociatesPage() {
         {/* Centered Header Section */}
         <div className="text-center mb-8 sm:mb-12">
           <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-3">
-            Our Associate Universities
+           Universities
           </h1>
           <div className="w-20 h-1 bg-gradient-to-r from-[red] to-[red] mx-auto mb-4 rounded-full"></div>
           <p className="text-gray-600 max-w-2xl mx-auto text-sm sm:text-base px-4">
