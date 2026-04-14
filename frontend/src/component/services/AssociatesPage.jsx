@@ -14,7 +14,7 @@ export default function AssociatesPage() {
 
   // Backend base URL for file access (without /api)
   const BACKEND_URL = "https://api.eduglobe.ae";
-  //  const BACKEND_URL = "http://localhost:5009";
+  // const BACKEND_URL = "http://localhost:5009";
 
   // Fetch universities from API
   useEffect(() => {
@@ -27,7 +27,21 @@ export default function AssociatesPage() {
       setError(null);
       const response = await axiosInstance.get("/associates");
       console.log("Fetched universities:", response.data);
-      setUniversities(response.data.data || []);
+      
+      // Sort universities by createdAt (oldest first - jo sabse pahle add hua wo pahle dikhega)
+      const sortedUniversities = (response.data.data || []).sort((a, b) => {
+        // If createdAt exists, use it for sorting
+        if (a.createdAt && b.createdAt) {
+          return new Date(a.createdAt) - new Date(b.createdAt);
+        }
+        // Fallback: if no createdAt, try using _id (MongoDB ObjectId contains timestamp)
+        if (a._id && b._id) {
+          return a._id.localeCompare(b._id);
+        }
+        return 0;
+      });
+      
+      setUniversities(sortedUniversities);
     } catch (error) {
       console.error("Error fetching universities:", error);
       setError("Failed to load universities. Please try again later.");
@@ -50,7 +64,7 @@ export default function AssociatesPage() {
 
   // Function to open PDF in viewer - Navigate to PDF Viewer Page with all documents
   const handleViewDocuments = (uni) => {
-   navigate(`/associates/${uni._id}`);
+    navigate(`/associates/${uni._id}`);
   };
 
   // Function to open website
@@ -78,16 +92,16 @@ export default function AssociatesPage() {
   if (loading) {
     return (
       <>
-      <Helmet>
-        <title>Associates | EduGlobe</title>
-        <meta name="description" content="Explore our network of associated universities and institutions." />
-      </Helmet>
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#00D4FF] mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading universities...</p>
+        <Helmet>
+          <title>Associates | EduGlobe</title>
+          <meta name="description" content="Explore our network of associated universities and institutions." />
+        </Helmet>
+        <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#00D4FF] mx-auto mb-4"></div>
+            <p className="text-gray-600">Loading universities...</p>
+          </div>
         </div>
-      </div>
       </>
     );
   }
@@ -116,7 +130,7 @@ export default function AssociatesPage() {
         {/* Centered Header Section */}
         <div className="text-center mb-8 sm:mb-12">
           <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-3">
-           Universities
+            Universities
           </h1>
           <div className="w-20 h-1 bg-gradient-to-r from-[red] to-[red] mx-auto mb-4 rounded-full"></div>
           <p className="text-gray-600 max-w-2xl mx-auto text-sm sm:text-base px-4">
