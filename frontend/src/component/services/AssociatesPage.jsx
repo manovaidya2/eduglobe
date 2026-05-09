@@ -63,10 +63,30 @@ export default function AssociatesPage() {
   });
 
   // Function to open PDF in viewer - Navigate to PDF Viewer Page with all documents
-  const handleViewDocuments = (uni) => {
-    navigate(`/associates/${uni._id}`);
-  };
+  // const handleViewDocuments = (uni) => {
+  //   navigate(`/associates/${uni._id}`);
+  // };
 
+// In your AssociatesPage.jsx, make sure this function is properly defined:
+
+const makeSlug = (name) => {
+  if (!name) return "";
+  return name
+    ?.toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9\s-]/g, "")
+    .replace(/\s+/g, "-");
+};
+
+const handleViewDocuments = (uni) => {
+  if (!uni || !uni.name) {
+    console.error("University or university name is missing");
+    return;
+  }
+  const slug = makeSlug(uni.name);
+  console.log("Navigating to:", `/associates/${slug}`);
+  navigate(`/associates/${slug}`);
+};
   // Function to open website
   const handleVisitWebsite = (url, uniName, e) => {
     e.stopPropagation(); // Prevent card click when clicking on website button

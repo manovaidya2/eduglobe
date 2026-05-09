@@ -57,7 +57,7 @@ function App() {
         <Route path="/refund-policy" element={<RefundPolicy />} /> 
         <Route path="/associates" element={<AssociatesPage />} />
          <Route path="/pdf-viewer" element={<PdfViewer />} />
-         <Route path="/associates/:id" element={<UniversityDetail />} />
+         <Route path="/associates/:name" element={<UniversityDetail />} />
          
       </Routes>
       <Footer />
