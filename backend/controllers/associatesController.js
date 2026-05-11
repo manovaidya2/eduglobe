@@ -9,7 +9,7 @@ const __dirname = path.dirname(__filename);
 // Create
 export const createAssociates = async (req, res) => {
   try {
-    const { name, location, type, website } = req.body;
+    const { name, location, type, website, displayOrder } = req.body;
 
     let logo = "";
     if (req.files?.logo) {
@@ -47,6 +47,7 @@ export const createAssociates = async (req, res) => {
       type,
       website,
       logo,
+      displayOrder: displayOrder ? parseInt(displayOrder) : 0,
       details,
       documents,
     });
@@ -66,7 +67,10 @@ export const createAssociates = async (req, res) => {
 // Get all associates
 export const getAllAssociates = async (req, res) => {
   try {
-    const associates = await Associates.find().sort({ createdAt: -1 });
+    // Sort by displayOrder first (ascending), then by createdAt (newest first for same order)
+    const associates = await Associates.find()
+      .sort({ displayOrder: 1, createdAt: -1 });
+    
     res.status(200).json({
       success: true,
       data: associates,
@@ -76,6 +80,7 @@ export const getAllAssociates = async (req, res) => {
     res.status(500).json({ message: "Server Error" });
   }
 };
+
 
 // Get single associate by ID
 export const getAssociateById = async (req, res) => {
@@ -101,7 +106,7 @@ export const getAssociateById = async (req, res) => {
 export const updateAssociate = async (req, res) => {
   try {
     const { id } = req.params;
-    const { name, location, type, website } = req.body;
+    const { name, location, type, website, displayOrder } = req.body;
 
     const existingAssociate = await Associates.findById(id);
     if (!existingAssociate) {
@@ -147,7 +152,16 @@ export const updateAssociate = async (req, res) => {
 
     const updatedAssociate = await Associates.findByIdAndUpdate(
       id,
-      { name, location, type, website, logo, details, documents },
+      { 
+        name, 
+        location, 
+        type, 
+        website, 
+        logo, 
+        displayOrder: displayOrder ? parseInt(displayOrder) : existingAssociate.displayOrder,
+        details, 
+        documents 
+      },
       { new: true, runValidators: true }
     );
 
@@ -216,6 +230,30 @@ export const deleteAssociate = async (req, res) => {
     await Associates.findByIdAndDelete(id);
 
     res.status(200).json({ message: "Associate deleted successfully" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server Error" });
+  }
+};
+
+
+export const reorderAssociates = async (req, res) => {
+  try {
+    const { orders } = req.body; // orders should be [{ id: "associateId", displayOrder: 1 }, ...]
+    
+    const updatePromises = orders.map(order => 
+      Associates.findByIdAndUpdate(order.id, { displayOrder: order.displayOrder })
+    );
+    
+    await Promise.all(updatePromises);
+    
+    const updatedAssociates = await Associates.find().sort({ displayOrder: 1, createdAt: -1 });
+    
+    res.status(200).json({
+      success: true,
+      message: "Order updated successfully",
+      data: updatedAssociates,
+    });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Server Error" });

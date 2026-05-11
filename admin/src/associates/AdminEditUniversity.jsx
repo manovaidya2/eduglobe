@@ -12,6 +12,7 @@ export default function AdminEditUniversity() {
     location: "",
     type: "",
     website: "",
+    displayOrder: 0,
     logo: null,
     existingLogo: "",
     details: [],
@@ -32,6 +33,7 @@ export default function AdminEditUniversity() {
         location: data.location,
         type: data.type,
         website: data.website || "",
+        displayOrder: data.displayOrder ?? 0,
         logo: null,
         existingLogo: data.logo || "",
         // details array backend se aayega — [{heading, description}]
@@ -101,6 +103,7 @@ export default function AdminEditUniversity() {
       formData.append("location", form.location);
       formData.append("type", form.type);
       formData.append("website", form.website);
+      formData.append("displayOrder", form.displayOrder);
       if (form.logo) formData.append("logo", form.logo);
 
       formData.append(
@@ -145,22 +148,63 @@ export default function AdminEditUniversity() {
         <h2 className="text-2xl font-bold text-gray-800 text-center">Edit Associate</h2>
 
         {/* Basic Fields */}
-        <input type="text" name="name" placeholder="University Name" value={form.name}
+        <input 
+          type="text" 
+          name="name" 
+          placeholder="University Name" 
+          value={form.name}
           onChange={handleChange}
-          className="w-full border border-gray-300 p-2 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" required />
+          className="w-full border border-gray-300 p-2 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" 
+          required 
+        />
 
         <div className="grid grid-cols-2 gap-3">
-          <input type="text" name="location" placeholder="Location" value={form.location}
+          <input 
+            type="text" 
+            name="location" 
+            placeholder="Location" 
+            value={form.location}
             onChange={handleChange}
-            className="border border-gray-300 p-2 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" required />
-          <input type="text" name="type" placeholder="Type (Private/Government)" value={form.type}
+            className="border border-gray-300 p-2 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" 
+            required 
+          />
+          <input 
+            type="text" 
+            name="type" 
+            placeholder="Type (Private/Government)" 
+            value={form.type}
             onChange={handleChange}
-            className="border border-gray-300 p-2 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" required />
+            className="border border-gray-300 p-2 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" 
+            required 
+          />
         </div>
 
-        <input type="text" name="website" placeholder="Website URL" value={form.website}
+        <input 
+          type="text" 
+          name="website" 
+          placeholder="Website URL" 
+          value={form.website}
           onChange={handleChange}
-          className="w-full border border-gray-300 p-2 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" />
+          className="w-full border border-gray-300 p-2 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" 
+        />
+
+        {/* Display Order Field */}
+        <div>
+          <label className="block font-medium text-gray-700 mb-1">
+            Display Order <span className="text-xs text-gray-500">(Lower number = appears first)</span>
+          </label>
+          <input 
+            type="number" 
+            name="displayOrder" 
+            min="0"
+            value={form.displayOrder}
+            onChange={handleChange}
+            className="w-full border border-gray-300 p-2 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" 
+          />
+          <p className="text-xs text-gray-500 mt-1">
+            Universities will be sorted by this number (0, 1, 2...). Smallest number appears first on frontend.
+          </p>
+        </div>
 
         {/* Logo */}
         {form.existingLogo && (
@@ -177,8 +221,12 @@ export default function AdminEditUniversity() {
           <label className="block font-medium text-gray-700 mb-1">
             {form.existingLogo ? "Change Logo (Optional)" : "Upload Logo"}
           </label>
-          <input type="file" accept="image/*" onChange={handleLogoChange}
-            className="w-full border p-2 rounded-lg bg-gray-50" />
+          <input 
+            type="file" 
+            accept="image/*" 
+            onChange={handleLogoChange}
+            className="w-full border p-2 rounded-lg bg-gray-50" 
+          />
           {form.logo && (
             <p className="text-sm text-green-600 mt-1">New selected: {form.logo.name}</p>
           )}
@@ -197,14 +245,19 @@ export default function AdminEditUniversity() {
                 <button type="button" onClick={() => removeDetail(i)}
                   className="absolute top-2 right-2 bg-red-100 text-red-600 text-xs px-2 py-1 rounded">✕</button>
               )}
-              <input type="text" placeholder="Heading (e.g. About the University)"
+              <input 
+                type="text" 
+                placeholder="Heading (e.g. About the University)"
                 value={detail.heading}
                 onChange={(e) => handleDetailChange(i, "heading", e.target.value)}
-                className="w-full border border-gray-300 p-2 rounded-lg outline-none focus:ring-2 focus:ring-blue-500 mb-2" />
-              <textarea placeholder="Description..."
+                className="w-full border border-gray-300 p-2 rounded-lg outline-none focus:ring-2 focus:ring-blue-500 mb-2" 
+              />
+              <textarea 
+                placeholder="Description..."
                 value={detail.description}
                 onChange={(e) => handleDetailChange(i, "description", e.target.value)}
-                className="w-full border border-gray-300 p-2 rounded-lg outline-none focus:ring-2 focus:ring-blue-500 resize-y min-h-[80px]" />
+                className="w-full border border-gray-300 p-2 rounded-lg outline-none focus:ring-2 focus:ring-blue-500 resize-y min-h-[80px]" 
+              />
             </div>
           ))}
         </div>
@@ -229,10 +282,19 @@ export default function AdminEditUniversity() {
                       <path d="M15.5 17.5h3M17 16v3" stroke="white" strokeWidth="1.2" strokeLinecap="round"/>
                     </svg>
                   </div>
-                  <span className="flex-1 text-sm text-gray-700 truncate">
-                    {/* doc agar object hai to doc.name, agar string hai to doc */}
-                    {typeof doc === "object" ? doc.name : doc}
-                  </span>
+                  <div className="flex-1">
+                    <span className="text-sm text-gray-700 block">
+                      {typeof doc === "object" ? doc.name : doc}
+                    </span>
+                    <a 
+                      href={`https://api.eduglobe.ae/uploads/${doc.file}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-xs text-blue-600 hover:underline"
+                    >
+                      View Document
+                    </a>
+                  </div>
                   <button type="button"
                     onClick={() => removeExistingDocument(i, typeof doc === "object" ? doc.name : doc)}
                     className="bg-red-100 text-red-600 text-xs px-3 py-1.5 rounded-lg hover:bg-red-200">
@@ -264,18 +326,25 @@ export default function AdminEditUniversity() {
                 </svg>
               </div>
               <div className="flex-1 space-y-1">
-                <input type="text" placeholder="Document name (e.g. Application Form)"
+                <input 
+                  type="text" 
+                  placeholder="Document name (e.g. Application Form)"
                   value={doc.name}
                   onChange={(e) => handleNewDocChange(i, "name", e.target.value)}
-                  className="w-full border border-gray-300 p-1.5 rounded text-sm outline-none focus:ring-2 focus:ring-blue-400" />
+                  className="w-full border border-gray-300 p-1.5 rounded text-sm outline-none focus:ring-2 focus:ring-blue-400" 
+                />
                 <div className="flex items-center gap-2">
                   <span className="text-xs text-gray-500 flex-1 truncate">
                     {doc.file ? doc.file.name : "No file chosen"}
                   </span>
                   <label className="text-xs border border-gray-300 px-3 py-1 rounded cursor-pointer hover:bg-gray-100">
                     Choose PDF
-                    <input type="file" accept="application/pdf" className="hidden"
-                      onChange={(e) => handleNewDocChange(i, "file", e.target.files[0] || null)} />
+                    <input 
+                      type="file" 
+                      accept="application/pdf" 
+                      className="hidden"
+                      onChange={(e) => handleNewDocChange(i, "file", e.target.files[0] || null)} 
+                    />
                   </label>
                 </div>
               </div>

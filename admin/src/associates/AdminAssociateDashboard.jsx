@@ -6,6 +6,8 @@ export default function AdminAssociateDashboard() {
   const [associates, setAssociates] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
+  const [reorderMode, setReorderMode] = useState(false);
+  const [tempOrders, setTempOrders] = useState({});
   const [stats, setStats] = useState({
     total: 0,
     private: 0,
@@ -56,7 +58,50 @@ export default function AdminAssociateDashboard() {
     }
   };
 
-  const filteredAssociates = associates.filter(associate =>
+  const handleOrderChange = (id, value) => {
+    setTempOrders(prev => ({
+      ...prev,
+      [id]: parseInt(value) || 0
+    }));
+  };
+
+  const saveNewOrder = async () => {
+    try {
+      const orders = Object.entries(tempOrders).map(([id, displayOrder]) => ({
+        id,
+        displayOrder
+      }));
+      
+      await axiosInstance.post("/associates/reorder", { orders });
+      alert("Order updated successfully!");
+      setReorderMode(false);
+      setTempOrders({});
+      fetchAssociates();
+    } catch (error) {
+      console.error("Error saving order:", error);
+      alert("Failed to update order");
+    }
+  };
+
+  const cancelReorder = () => {
+    setReorderMode(false);
+    setTempOrders({});
+  };
+
+  // Sort associates for display
+  const sortedAssociates = [...associates].sort((a, b) => {
+    if (reorderMode) {
+      // In reorder mode, keep original order
+      return 0;
+    }
+    // Normal mode: sort by displayOrder then createdAt
+    const orderA = a.displayOrder ?? 999999;
+    const orderB = b.displayOrder ?? 999999;
+    if (orderA !== orderB) return orderA - orderB;
+    return new Date(a.createdAt) - new Date(b.createdAt);
+  });
+
+  const filteredAssociates = sortedAssociates.filter(associate =>
     associate.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     associate.location?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     associate.type?.toLowerCase().includes(searchTerm.toLowerCase())
@@ -76,12 +121,37 @@ export default function AdminAssociateDashboard() {
         {/* Header */}
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-3xl font-bold text-gray-800">Admin Dashboard</h1>
-          <Link
-            to="/add-associate"
-            className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition flex items-center gap-2"
-          >
-            <span>+</span> Add New Associate
-          </Link>
+          <div className="flex gap-3">
+            {!reorderMode ? (
+              <button
+                onClick={() => setReorderMode(true)}
+                className="bg-purple-600 text-white px-6 py-2 rounded-lg hover:bg-purple-700 transition flex items-center gap-2"
+              >
+                🔄 Reorder Universities
+              </button>
+            ) : (
+              <>
+                <button
+                  onClick={saveNewOrder}
+                  className="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 transition flex items-center gap-2"
+                >
+                  💾 Save Order
+                </button>
+                <button
+                  onClick={cancelReorder}
+                  className="bg-gray-500 text-white px-6 py-2 rounded-lg hover:bg-gray-600 transition"
+                >
+                  Cancel
+                </button>
+              </>
+            )}
+            <Link
+              to="/add-associate"
+              className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition flex items-center gap-2"
+            >
+              <span>+</span> Add New Associate
+            </Link>
+          </div>
         </div>
 
         {/* Stats Cards */}
@@ -146,12 +216,25 @@ export default function AdminAssociateDashboard() {
           </button>
         </div>
 
+        {/* Info Banner for Reorder Mode */}
+        {reorderMode && (
+          <div className="mb-4 bg-purple-100 border border-purple-300 text-purple-800 px-4 py-3 rounded-lg">
+            <p className="text-sm">
+              🔄 <strong>Reorder Mode Active:</strong> Enter numbers in the "Display Order" column. 
+              Lower numbers will appear first on the frontend. Click "Save Order" when done.
+            </p>
+          </div>
+        )}
+
         {/* Associates Table */}
         <div className="bg-white rounded-xl shadow-lg overflow-hidden">
           <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">
                 <tr>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Display<br/>Order
+                  </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     S.No
                   </th>
@@ -174,9 +257,6 @@ export default function AdminAssociateDashboard() {
                     Documents
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Created At
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Actions
                   </th>
                 </tr>
@@ -184,6 +264,21 @@ export default function AdminAssociateDashboard() {
               <tbody className="bg-white divide-y divide-gray-200">
                 {filteredAssociates.map((associate, index) => (
                   <tr key={associate._id} className="hover:bg-gray-50 transition">
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      {reorderMode ? (
+                        <input
+                          type="number"
+                          min="0"
+                          defaultValue={associate.displayOrder ?? 0}
+                          onChange={(e) => handleOrderChange(associate._id, e.target.value)}
+                          className="w-20 px-2 py-1 border border-gray-300 rounded text-center"
+                        />
+                      ) : (
+                        <span className="text-sm font-mono text-gray-600">
+                          {associate.displayOrder ?? '—'}
+                        </span>
+                      )}
+                    </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                       {index + 1}
                     </td>
@@ -241,7 +336,7 @@ export default function AdminAssociateDashboard() {
                         {associate.documents?.length > 0 && (
                           <button
                             onClick={() => {
-                              const docs = associate.documents.join("\n");
+                              const docs = associate.documents.map(d => `${d.name}: ${d.file}`).join("\n");
                               alert(`Documents:\n${docs}`);
                             }}
                             className="ml-2 text-blue-600 hover:underline text-xs"
@@ -250,9 +345,6 @@ export default function AdminAssociateDashboard() {
                           </button>
                         )}
                       </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {new Date(associate.createdAt).toLocaleDateString()}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                       <div className="flex gap-2">
@@ -292,7 +384,7 @@ export default function AdminAssociateDashboard() {
             </div>
           )}
           
-          {/* Table Footer with Pagination (Optional) */}
+          {/* Table Footer */}
           {filteredAssociates.length > 0 && (
             <div className="bg-gray-50 px-6 py-3 border-t border-gray-200">
               <div className="flex justify-between items-center">
@@ -300,14 +392,6 @@ export default function AdminAssociateDashboard() {
                   Showing <span className="font-medium">{filteredAssociates.length}</span> of{" "}
                   <span className="font-medium">{associates.length}</span> associates
                 </p>
-                <div className="flex gap-2">
-                  <button className="px-3 py-1 border rounded text-gray-600 hover:bg-gray-100">
-                    Previous
-                  </button>
-                  <button className="px-3 py-1 border rounded text-gray-600 hover:bg-gray-100">
-                    Next
-                  </button>
-                </div>
               </div>
             </div>
           )}

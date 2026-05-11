@@ -1,3 +1,4 @@
+// routes/associatesRoutes.js
 import express from "express";
 import { 
   createAssociates, 
@@ -5,7 +6,8 @@ import {
   getAssociateById,
   updateAssociate,
   deleteAssociate,
-  deleteDocument
+  deleteDocument,
+  reorderAssociates  // Add this import
 } from "../controllers/associatesController.js";
 import { upload } from "../middleware/upload.js";
 
@@ -23,5 +25,6 @@ router.get("/associates/:id", getAssociateById);
 router.put("/associates/:id", uploadFields, updateAssociate);
 router.delete("/associates/:id", deleteAssociate);
 router.delete("/associates/:id/documents/:docIndex", deleteDocument);
+router.post("/associates/reorder", reorderAssociates); // New route for reordering
 
 export default router;

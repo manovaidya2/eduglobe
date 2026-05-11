@@ -7,6 +7,7 @@ export default function AdminAddUniversity() {
     location: "",
     type: "",
     website: "",
+    displayOrder: 0,
     logo: null,
     details: [{ heading: "", description: "" }],
     documents: [{ name: "", file: null }],
@@ -47,6 +48,7 @@ export default function AdminAddUniversity() {
       formData.append("location", form.location);
       formData.append("type", form.type);
       formData.append("website", form.website);
+      formData.append("displayOrder", form.displayOrder);
       if (form.logo) formData.append("logo", form.logo);
 
       // Details as JSON string
@@ -67,7 +69,12 @@ export default function AdminAddUniversity() {
       });
       alert(res.data.message || "Associates added successfully ✅");
       setForm({
-        name: "", location: "", type: "", website: "", logo: null,
+        name: "", 
+        location: "", 
+        type: "", 
+        website: "", 
+        displayOrder: 0,
+        logo: null,
         details: [{ heading: "", description: "" }],
         documents: [{ name: "", file: null }],
       });
@@ -84,22 +91,74 @@ export default function AdminAddUniversity() {
         <h2 className="text-2xl font-bold text-gray-800 text-center">Add Associates</h2>
 
         {/* Basic Fields */}
-        <input type="text" name="name" placeholder="University Name" value={form.name}
-          onChange={handleChange} className="w-full border border-gray-300 p-2 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" required />
+        <input 
+          type="text" 
+          name="name" 
+          placeholder="University Name" 
+          value={form.name}
+          onChange={handleChange} 
+          className="w-full border border-gray-300 p-2 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" 
+          required 
+        />
+        
         <div className="grid grid-cols-2 gap-3">
-          <input type="text" name="location" placeholder="Location" value={form.location}
-            onChange={handleChange} className="border border-gray-300 p-2 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" required />
-          <input type="text" name="type" placeholder="Type (Private/Government)" value={form.type}
-            onChange={handleChange} className="border border-gray-300 p-2 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" required />
+          <input 
+            type="text" 
+            name="location" 
+            placeholder="Location" 
+            value={form.location}
+            onChange={handleChange} 
+            className="border border-gray-300 p-2 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" 
+            required 
+          />
+          <input 
+            type="text" 
+            name="type" 
+            placeholder="Type (Private/Government)" 
+            value={form.type}
+            onChange={handleChange} 
+            className="border border-gray-300 p-2 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" 
+            required 
+          />
         </div>
-        <input type="text" name="website" placeholder="Website URL" value={form.website}
-          onChange={handleChange} className="w-full border border-gray-300 p-2 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" />
+        
+        <input 
+          type="text" 
+          name="website" 
+          placeholder="Website URL" 
+          value={form.website}
+          onChange={handleChange} 
+          className="w-full border border-gray-300 p-2 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" 
+        />
+
+        {/* Display Order Field */}
+        <div>
+          <label className="block font-medium text-gray-700 mb-1">
+            Display Order <span className="text-xs text-gray-500">(Lower number = appears first)</span>
+          </label>
+          <input 
+            type="number" 
+            name="displayOrder" 
+            min="0"
+            value={form.displayOrder}
+            onChange={handleChange}
+            className="w-full border border-gray-300 p-2 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" 
+          />
+          <p className="text-xs text-gray-500 mt-1">
+            Universities will be sorted by this number (0, 1, 2...). Smallest number appears first on frontend.
+            You can reorder later from the dashboard.
+          </p>
+        </div>
 
         {/* Logo */}
         <div>
           <label className="block font-medium text-gray-700 mb-1">Upload Logo</label>
-          <input type="file" accept="image/*" onChange={handleLogoChange}
-            className="w-full border p-2 rounded-lg bg-gray-50" />
+          <input 
+            type="file" 
+            accept="image/*" 
+            onChange={handleLogoChange}
+            className="w-full border p-2 rounded-lg bg-gray-50" 
+          />
           {form.logo && <p className="text-sm text-green-600 mt-1">Selected: {form.logo.name}</p>}
         </div>
 
@@ -116,12 +175,19 @@ export default function AdminAddUniversity() {
                 <button type="button" onClick={() => removeDetail(i)}
                   className="absolute top-2 right-2 bg-red-100 text-red-600 text-xs px-2 py-1 rounded">✕</button>
               )}
-              <input type="text" placeholder="Heading (e.g. About the University)"
-                value={detail.heading} onChange={(e) => handleDetailChange(i, "heading", e.target.value)}
-                className="w-full border border-gray-300 p-2 rounded-lg outline-none focus:ring-2 focus:ring-blue-500 mb-2" />
-              <textarea placeholder="Description..." value={detail.description}
+              <input 
+                type="text" 
+                placeholder="Heading (e.g. About the University)"
+                value={detail.heading} 
+                onChange={(e) => handleDetailChange(i, "heading", e.target.value)}
+                className="w-full border border-gray-300 p-2 rounded-lg outline-none focus:ring-2 focus:ring-blue-500 mb-2" 
+              />
+              <textarea 
+                placeholder="Description..." 
+                value={detail.description}
                 onChange={(e) => handleDetailChange(i, "description", e.target.value)}
-                className="w-full border border-gray-300 p-2 rounded-lg outline-none focus:ring-2 focus:ring-blue-500 resize-y min-h-[80px]" />
+                className="w-full border border-gray-300 p-2 rounded-lg outline-none focus:ring-2 focus:ring-blue-500 resize-y min-h-[80px]" 
+              />
             </div>
           ))}
         </div>
@@ -146,17 +212,25 @@ export default function AdminAddUniversity() {
                 </svg>
               </div>
               <div className="flex-1 space-y-1">
-                <input type="text" placeholder="Document name (e.g. VCS-TCHP Scheme)"
-                  value={doc.name} onChange={(e) => handleDocChange(i, "name", e.target.value)}
-                  className="w-full border border-gray-300 p-1.5 rounded text-sm outline-none focus:ring-2 focus:ring-blue-400" />
+                <input 
+                  type="text" 
+                  placeholder="Document name (e.g. VCS-TCHP Scheme)"
+                  value={doc.name} 
+                  onChange={(e) => handleDocChange(i, "name", e.target.value)}
+                  className="w-full border border-gray-300 p-1.5 rounded text-sm outline-none focus:ring-2 focus:ring-blue-400" 
+                />
                 <div className="flex items-center gap-2">
                   <span className="text-xs text-gray-500 flex-1 truncate">
                     {doc.file ? doc.file.name : "No file chosen"}
                   </span>
                   <label className="text-xs border border-gray-300 px-3 py-1 rounded cursor-pointer hover:bg-gray-100">
                     Choose PDF
-                    <input type="file" accept="application/pdf" className="hidden"
-                      onChange={(e) => handleDocChange(i, "file", e.target.files[0] || null)} />
+                    <input 
+                      type="file" 
+                      accept="application/pdf" 
+                      className="hidden"
+                      onChange={(e) => handleDocChange(i, "file", e.target.files[0] || null)} 
+                    />
                   </label>
                 </div>
               </div>
@@ -166,8 +240,11 @@ export default function AdminAddUniversity() {
           ))}
         </div>
 
-        <button type="submit" disabled={loading}
-          className="w-full bg-blue-600 text-white py-2 rounded-lg font-semibold hover:bg-blue-700 transition disabled:opacity-50">
+        <button 
+          type="submit" 
+          disabled={loading}
+          className="w-full bg-blue-600 text-white py-2 rounded-lg font-semibold hover:bg-blue-700 transition disabled:opacity-50"
+        >
           {loading ? "Submitting..." : "Submit Associates"}
         </button>
       </form>

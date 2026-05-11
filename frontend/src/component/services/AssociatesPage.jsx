@@ -14,7 +14,6 @@ export default function AssociatesPage() {
 
   // Backend base URL for file access (without /api)
   const BACKEND_URL = "https://api.eduglobe.ae";
-  // const BACKEND_URL = "http://localhost:5009";
 
   // Fetch universities from API
   useEffect(() => {
@@ -28,16 +27,22 @@ export default function AssociatesPage() {
       const response = await axiosInstance.get("/associates");
       console.log("Fetched universities:", response.data);
       
-      // Sort universities by createdAt (oldest first - jo sabse pahle add hua wo pahle dikhega)
+      // CRITICAL: Sort by displayOrder in ASCENDING order (0,1,2,3...)
       const sortedUniversities = (response.data.data || []).sort((a, b) => {
-        // If createdAt exists, use it for sorting
+        // Get displayOrder values, default to 999999 if not set (so they appear at the end)
+        const orderA = a.displayOrder !== undefined && a.displayOrder !== null ? a.displayOrder : 999999;
+        const orderB = b.displayOrder !== undefined && b.displayOrder !== null ? b.displayOrder : 999999;
+        
+        // Sort by displayOrder (smaller number first)
+        if (orderA !== orderB) {
+          return orderA - orderB;
+        }
+        
+        // If same displayOrder, sort by createdAt (older first)
         if (a.createdAt && b.createdAt) {
           return new Date(a.createdAt) - new Date(b.createdAt);
         }
-        // Fallback: if no createdAt, try using _id (MongoDB ObjectId contains timestamp)
-        if (a._id && b._id) {
-          return a._id.localeCompare(b._id);
-        }
+        
         return 0;
       });
       
@@ -53,7 +58,7 @@ export default function AssociatesPage() {
   // Get unique university types for filter
   const universityTypes = ["all", ...new Set(universities.map(uni => uni.type).filter(Boolean))];
 
-  // Filter universities based on search and type
+  // Filter universities based on search and type (maintains sorted order)
   const filteredUniversities = universities.filter(uni => {
     const matchesSearch = 
       (uni.name && uni.name.toLowerCase().includes(searchTerm.toLowerCase())) ||
@@ -62,34 +67,27 @@ export default function AssociatesPage() {
     return matchesSearch && matchesType;
   });
 
-  // Function to open PDF in viewer - Navigate to PDF Viewer Page with all documents
-  // const handleViewDocuments = (uni) => {
-  //   navigate(`/associates/${uni._id}`);
-  // };
+  const makeSlug = (name) => {
+    if (!name) return "";
+    return name
+      ?.toLowerCase()
+      .trim()
+      .replace(/[^a-z0-9\s-]/g, "")
+      .replace(/\s+/g, "-");
+  };
 
-// In your AssociatesPage.jsx, make sure this function is properly defined:
-
-const makeSlug = (name) => {
-  if (!name) return "";
-  return name
-    ?.toLowerCase()
-    .trim()
-    .replace(/[^a-z0-9\s-]/g, "")
-    .replace(/\s+/g, "-");
-};
-
-const handleViewDocuments = (uni) => {
-  if (!uni || !uni.name) {
-    console.error("University or university name is missing");
-    return;
-  }
-  const slug = makeSlug(uni.name);
-  console.log("Navigating to:", `/associates/${slug}`);
-  navigate(`/associates/${slug}`);
-};
+  const handleViewDocuments = (uni) => {
+    if (!uni || !uni.name) {
+      console.error("University or university name is missing");
+      return;
+    }
+    const slug = makeSlug(uni.name);
+    navigate(`/associates/${slug}`);
+  };
+  
   // Function to open website
   const handleVisitWebsite = (url, uniName, e) => {
-    e.stopPropagation(); // Prevent card click when clicking on website button
+    e.stopPropagation();
     if (url && url !== "#" && url !== "") {
       window.open(url, '_blank', 'noopener,noreferrer');
     } else {
@@ -158,10 +156,10 @@ const handleViewDocuments = (uni) => {
           </p>
         </div>
 
-        {/* Search and Filter Section - Always in a single row */}
+        {/* Search and Filter Section */}
         <div className="bg-white rounded-xl shadow-md p-4 sm:p-6 mb-8">
           <div className="flex flex-row gap-4">
-            {/* Search Bar - takes remaining space */}
+            {/* Search Bar */}
             <div className="flex-1 relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
               <input
@@ -173,7 +171,7 @@ const handleViewDocuments = (uni) => {
               />
             </div>
 
-            {/* Filter Dropdown - fixed width */}
+            {/* Filter Dropdown */}
             <div className="relative w-[220px]">
               <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
               <select
@@ -189,7 +187,7 @@ const handleViewDocuments = (uni) => {
               </select>
             </div>
 
-            {/* Clear Filters Button - only shows when filters active */}
+            {/* Clear Filters Button */}
             {(searchTerm || selectedType !== "all") && (
               <button
                 onClick={clearFilters}
@@ -209,7 +207,7 @@ const handleViewDocuments = (uni) => {
           )}
         </div>
 
-        {/* UNIVERSITY CARDS - Responsive Grid */}
+        {/* UNIVERSITY CARDS - Displayed in Display Order */}
         {filteredUniversities.length === 0 ? (
           <div className="text-center py-12 bg-white rounded-xl shadow-md">
             <div className="text-6xl mb-4">🔍</div>
@@ -222,80 +220,87 @@ const handleViewDocuments = (uni) => {
             </button>
           </div>
         ) : (
-          <>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-              {filteredUniversities.map((uni, idx) => (
-                <div 
-                  key={uni._id || idx} 
-                  onClick={() => handleViewDocuments(uni)}
-                  className="bg-white rounded-xl border border-gray-200 shadow-sm hover:shadow-xl transition-all duration-300 hover:border-[#00D4FF]/30 overflow-hidden group cursor-pointer"
-                >
-                  <div className="p-4 sm:p-5">
-                    {/* University Header */}
-                    <div className="flex items-start gap-3">
-                      {/* Logo */}
-                      {uni.logo ? (
-                        <img
-                          src={getImageUrl(uni.logo)}
-                          alt={uni.name}
-                          className="w-10 h-10 sm:w-12 sm:h-12 rounded-full object-cover border border-gray-200"
-                          onError={(e) => {
-                            e.target.src = "https://via.placeholder.com/48?text=Logo";
-                          }}
-                        />
-                      ) : (
-                        <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-[#00D4FF]/10 flex items-center justify-center text-[#00D4FF] flex-shrink-0">
-                          <Building2 size={20} className="sm:w-6 sm:h-6" />
-                        </div>
-                      )}
-                      
-                      <div className="flex-1 min-w-0">
-                        <h3 className="font-bold text-base sm:text-lg text-gray-900 leading-tight group-hover:text-[red] transition-colors line-clamp-2">
-                          {uni.name}
-                        </h3>
-                        {uni.location && (
-                          <p className="text-xs sm:text-sm text-gray-500 mt-0.5 truncate">
-                            📍 {uni.location}
-                          </p>
-                        )}
-                        <span className="inline-block mt-1 text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full">
-                          {uni.type || "University"}
-                        </span>
-                      </div>
-                    </div>
-
-                    {/* Documents Count Badge */}
-                    {uni.documents && uni.documents.length > 0 ? (
-                      <div className="mt-4 pt-3 border-t border-gray-100">
-                        <div className="flex items-center justify-center gap-2 text-sm text-gray-600">
-                          <FileText size={14} className="text-[red]" />
-                          <span>{uni.documents.length} Document{uni.documents.length !== 1 ? 's' : ''} Available</span>
-                          <Eye size={14} className="text-[red] ml-2" />
-                          <span className="text-xs text-gray-400">Click to view</span>
-                        </div>
-                      </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+            {filteredUniversities.map((uni, idx) => (
+              <div 
+                key={uni._id || idx} 
+                onClick={() => handleViewDocuments(uni)}
+                className="bg-white rounded-xl border border-gray-200 shadow-sm hover:shadow-xl transition-all duration-300 hover:border-[#00D4FF]/30 overflow-hidden group cursor-pointer"
+              >
+                <div className="p-4 sm:p-5">
+                  {/* University Header */}
+                  <div className="flex items-start gap-3">
+                    {/* Logo */}
+                    {uni.logo ? (
+                      <img
+                        src={getImageUrl(uni.logo)}
+                        alt={uni.name}
+                        className="w-10 h-10 sm:w-12 sm:h-12 rounded-full object-cover border border-gray-200"
+                        onError={(e) => {
+                          e.target.src = "https://via.placeholder.com/48?text=Logo";
+                        }}
+                      />
                     ) : (
-                      <div className="mt-4 pt-3 border-t border-gray-100">
-                        <p className="text-xs text-gray-400 text-center py-2">
-                          No documents available
-                        </p>
+                      <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-[#00D4FF]/10 flex items-center justify-center text-[#00D4FF] flex-shrink-0">
+                        <Building2 size={20} className="sm:w-6 sm:h-6" />
                       </div>
                     )}
-
-                    {/* Website Button */}
-                    <button
-                      onClick={(e) => handleVisitWebsite(uni.website, uni.name, e)}
-                      className="mt-4 w-full flex items-center justify-center gap-2 text-xs sm:text-sm bg-gradient-to-r from-[red] to-[red] text-white px-3 py-2 rounded-lg hover:shadow-lg transition-all duration-300 transform hover:scale-105"
-                    >
-                      <Globe size={14} />
-                      Visit Official Website
-                      <ExternalLink size={12} />
-                    </button>
+                    
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-bold text-base sm:text-lg text-gray-900 leading-tight group-hover:text-[red] transition-colors line-clamp-2">
+                        {uni.name}
+                      </h3>
+                      {uni.location && (
+                        <p className="text-xs sm:text-sm text-gray-500 mt-0.5 truncate">
+                          📍 {uni.location}
+                        </p>
+                      )}
+                      <span className="inline-block mt-1 text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full">
+                        {uni.type || "University"}
+                      </span>
+                    </div>
                   </div>
+
+                  {/* Display Order Badge - Shows current priority (useful for admin to verify) */}
+                  {uni.displayOrder !== undefined && uni.displayOrder !== null && uni.displayOrder !== 0 && (
+                    <div className="mt-2 text-right">
+                      <span className="text-xs text-gray-400 bg-gray-50 px-2 py-1 rounded">
+                        Order: {uni.displayOrder}
+                      </span>
+                    </div>
+                  )}
+
+                  {/* Documents Count Badge */}
+                  {uni.documents && uni.documents.length > 0 ? (
+                    <div className="mt-4 pt-3 border-t border-gray-100">
+                      <div className="flex items-center justify-center gap-2 text-sm text-gray-600">
+                        <FileText size={14} className="text-[red]" />
+                        <span>{uni.documents.length} Document{uni.documents.length !== 1 ? 's' : ''} Available</span>
+                        <Eye size={14} className="text-[red] ml-2" />
+                        <span className="text-xs text-gray-400">Click to view</span>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="mt-4 pt-3 border-t border-gray-100">
+                      <p className="text-xs text-gray-400 text-center py-2">
+                        No documents available
+                      </p>
+                    </div>
+                  )}
+
+                  {/* Website Button */}
+                  <button
+                    onClick={(e) => handleVisitWebsite(uni.website, uni.name, e)}
+                    className="mt-4 w-full flex items-center justify-center gap-2 text-xs sm:text-sm bg-gradient-to-r from-[red] to-[red] text-white px-3 py-2 rounded-lg hover:shadow-lg transition-all duration-300 transform hover:scale-105"
+                  >
+                    <Globe size={14} />
+                    Visit Official Website
+                    <ExternalLink size={12} />
+                  </button>
                 </div>
-              ))}
-            </div>
-          </>
+              </div>
+            ))}
+          </div>
         )}
 
         {/* Stats Footer */}

@@ -1,3 +1,4 @@
+// models/associates.js
 import mongoose from "mongoose";
 
 const associatesSchema = new mongoose.Schema(
@@ -7,6 +8,10 @@ const associatesSchema = new mongoose.Schema(
     type: String,
     website: String,
     logo: String,
+    displayOrder: {
+      type: Number,
+      default: 0,  // Lower number = appears first
+    },
     details: [
       {
         heading: String,
