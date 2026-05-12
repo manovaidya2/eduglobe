@@ -3,7 +3,7 @@ import * as applicationController from '../controllers/applicationController.js'
 
 const router = express.Router();
 
-// Application routes
+      // Application  routes for  CRUD operations and status updates
 router.post('/applications', applicationController.createApplication);
 router.get('/applications', applicationController.getAllApplications);
 router.get('/applications/stats', applicationController.getApplicationStats);
