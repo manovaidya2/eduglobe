@@ -10,7 +10,7 @@ const axiosInstance = axios.create({
 });
 
 // Request interceptor for debugging
-axiosInstance.interceptors.request.use(
+      axiosInstance.interceptors.request.use(
   (config) => {
     console.log(`📤 ${config.method.toUpperCase()} request to: ${config.baseURL}${config.url}`);
     console.log("Request data:", config.data);
