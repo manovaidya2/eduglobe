@@ -19,6 +19,7 @@ import AssociatesPage from "./component/services/AssociatesPage";
 import PdfViewer from "./component/services/PdfViewer";
 import UniversityDetail from './pages/UniversityDetail';
 import { HelmetProvider } from "react-helmet-async";
+import Paymentpage from "./pages/Paymentpage";
 
 // ScrollToTop Component - This will scroll to top on route change
 const ScrollToTop = () => {
@@ -58,6 +59,7 @@ function App() {
         <Route path="/associates" element={<AssociatesPage />} />
          <Route path="/pdf-viewer" element={<PdfViewer />} />
          <Route path="/associates/:name" element={<UniversityDetail />} />
+        <Route path="/payment" element={<Paymentpage />} />
          
       </Routes>
       <Footer />

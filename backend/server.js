@@ -15,6 +15,7 @@ import contactRoutes from './routes/contactRoutes.js';
 import partnerRoutes from './routes/partnerRoutes.js';
 import agentRoutes from './routes/agentRoutes.js'; // Add this line  
 import associatesRoutes from "./routes/associatesRoutes.js";
+import eximpeRoute from "./routes/eximpeRoute.js";
 
 
 
@@ -56,6 +57,7 @@ app.use('/api', contactRoutes);
 app.use('/api/partners', partnerRoutes);
 app.use('/api/agents', agentRoutes); // Add this line
 app.use("/api", associatesRoutes);
+app.use("/api/eximpe", eximpeRoute);
 
 
 

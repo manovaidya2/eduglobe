@@ -93,8 +93,8 @@ onError={(e) => {
         </nav>
 
         <div className="hidden lg:block">
-          <Link to="/contact">
-            <Button>Get in Touch</Button>
+          <Link to="/payment">
+            <Button>Pay Now</Button>
           </Link>
         </div>
 
