@@ -275,7 +275,7 @@ export default function PaymentStep() {
       const Eximpe = await loadEximpeSdk();
 
       const eximpe = new Eximpe({
-        mode: "sandbox",
+        mode: "production",
       });
 
       await eximpe.checkout({
