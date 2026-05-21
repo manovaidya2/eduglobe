@@ -2,6 +2,13 @@ import express from "express";
 
 const router = express.Router();
 
+const eximpeHeaders = () => ({
+  "Content-Type": "application/json",
+  "X-API-Version": process.env.EXIMPE_API_VERSION || "2.0.0",
+  "X-Client-ID": process.env.EXIMPE_CLIENT_ID,
+  "X-Client-Secret": process.env.EXIMPE_CLIENT_SECRET,
+});
+
 router.post("/create-payment", async (req, res) => {
   try {
     const { amount, name, email, phone } = req.body;
@@ -14,6 +21,7 @@ router.post("/create-payment", async (req, res) => {
     }
 
     const onlyDigits = String(phone || "").replace(/\D/g, "");
+
     const finalPhone =
       onlyDigits.length === 10
         ? `+91${onlyDigits}`
@@ -54,21 +62,35 @@ router.post("/create-payment", async (req, res) => {
       },
     };
 
-    const response = await fetch(`${process.env.EXIMPE_BASE_URL}/pg/orders/`, {
+    const url = `${process.env.EXIMPE_BASE_URL}/pg/orders/`;
+
+    console.log("EximPe URL:", url);
+    console.log("EximPe Payload:", JSON.stringify(payload, null, 2));
+
+    const response = await fetch(url, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "X-API-Version": process.env.EXIMPE_API_VERSION || "2.0.0",
-        "X-Client-ID": process.env.EXIMPE_CLIENT_ID,
-        "X-Client-Secret": process.env.EXIMPE_CLIENT_SECRET,
-      },
+      headers: eximpeHeaders(),
       body: JSON.stringify(payload),
     });
 
-    const data = await response.json();
+    const rawText = await response.text();
 
     console.log("EximPe Status:", response.status);
-    console.log("EximPe Response:", JSON.stringify(data, null, 2));
+    console.log("EximPe Raw Response:", rawText);
+
+    let data;
+
+    try {
+      data = JSON.parse(rawText);
+    } catch (error) {
+      return res.status(500).json({
+        success: false,
+        message:
+          "EximPe returned HTML/non-JSON response. Production Base URL ya live API access issue hai.",
+        status: response.status,
+        raw: rawText.slice(0, 700),
+      });
+    }
 
     if (!response.ok) {
       return res.status(response.status).json({
@@ -102,5 +124,29 @@ router.post("/create-payment", async (req, res) => {
     });
   }
 });
+
+router.post(
+  "/webhook",
+  express.urlencoded({ extended: true }),
+  express.json(),
+  async (req, res) => {
+    try {
+      console.log("EximPe Webhook Headers:", req.headers);
+      console.log("EximPe Webhook Body:", req.body);
+
+      return res.status(200).json({
+        success: true,
+        message: "Webhook received",
+      });
+    } catch (error) {
+      console.error("Webhook error:", error);
+
+      return res.status(500).json({
+        success: false,
+        message: "Webhook failed",
+      });
+    }
+  }
+);
 
 export default router;
