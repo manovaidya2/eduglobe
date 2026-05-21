@@ -29,6 +29,7 @@ import AdminAddUniversity from "./associates/AdminAddUniversity";
 import AdminAssociateDashboard from "./associates/AdminAssociateDashboard";
 import AdminEditUniversity from "./associates/AdminEditUniversity";
 import AdminViewUniversity from "./associates/AdminViewUniversity";
+import AdminPayments from "./pages/AdminPayments";
 
 
 
@@ -67,6 +68,7 @@ function App() {
       <Route path="/admin-associates-dashboard" element={<Layout><AdminAssociateDashboard /></Layout>} />
        <Route path="/admin/edit-university/:id" element={<Layout><AdminEditUniversity /></Layout>} />
          <Route path="/admin/view-university/:id" element={<Layout><AdminViewUniversity /></Layout>} />
+         <Route path="/admin/payments" element={<Layout><AdminPayments /></Layout>} />
 
 
           <Route path="*" element={<Navigate to="/" />} />

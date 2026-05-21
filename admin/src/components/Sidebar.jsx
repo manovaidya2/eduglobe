@@ -107,7 +107,7 @@ const Sidebar = () => {
           <ul className="space-y-1">
             {[
               { to: "/dashboard", icon: FaTachometerAlt, label: "Dashboard", color: "from-[#00D4FF] to-[#0088FF]" },
-              // { to: "/study-india-dashboard", icon: FaBook, label: "Study India Dashboard", color: "from-[#00D4FF] to-[#0088FF]" },
+              { to: "/admin/payments", icon: FaBook, label: "Payments", color: "from-[#00D4FF] to-[#0088FF]" },
               // { to: "/admin-study-abroad", icon: FaFileAlt, label: "Study Abroad Dashboard  ", color: "from-[#00D4FF] to-[#0088FF]" },
               // { to: "/admin-universities", icon: FaCalendarAlt, label: "Universities", color: "from-[#00D4FF] to-[#0088FF]" },
               // { to: "/admin-dashboard", icon: FaChartLine, label: "Blog Manager", color: "from-[#00D4FF] to-[#0088FF]" },
