@@ -3,7 +3,8 @@
   import cors from "cors";
   import dotenv from "dotenv";
   dotenv.config();
-
+console.log("EXIMPE_BASE_URL:", process.env.EXIMPE_BASE_URL);
+console.log("EXIMPE_CLIENT_ID:", process.env.EXIMPE_CLIENT_ID);
 import caseStudyRoutes from "./routes/caseStudyRoutes.js";
 import appointmentRoutes from "./routes/appointmentRoutes.js";
 import studyIndiaProgramRoutes from "./routes/studyIndiaProgramRoutes.js";
