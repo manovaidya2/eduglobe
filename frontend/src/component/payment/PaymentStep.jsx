@@ -71,9 +71,9 @@ export default function PaymentStep() {
 
       const Eximpe = await loadEximpeSdk();
 
-      const eximpe = new Eximpe({
-        mode: "sandbox",
-      });
+   const eximpe = new Eximpe({
+  mode: "production",
+});
 
       await eximpe.checkout({
         paymentSessionId: data.session_id,
