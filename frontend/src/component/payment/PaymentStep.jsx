@@ -295,7 +295,7 @@ export default function PaymentStep() {
   };
 
   return (
-    <section className="bg-[#fafafa] py-16 px-4">
+    <section id="payment" className="bg-[#fafafa] py-16 px-4">
       <div className="mx-auto max-w-[800px] text-center">
         <span className="inline-flex rounded-full bg-[#fff3e8] px-4 py-2 text-[11px] font-bold uppercase tracking-[0.08em] text-[#d99a00]">
           STEP 1 OF 2
