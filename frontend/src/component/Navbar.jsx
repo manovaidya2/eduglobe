@@ -25,7 +25,7 @@ const navLinks = [
   { label: "Associates", path: "/associates" },
   { label: "Admissions", path: "/admissions" },
   { label: "Academic Support", path: "/academic-support" },
-  { label: "Skills Training", path: "/skills-training" },
+  { label: "Council", path: "/council" },
   { label: "For Institutions", path: "/institutions" },
   { label: "Partners", path: "/partners" },
   { label: "Why EduGlobe", path: "/why-eduglobe" },
@@ -48,8 +48,8 @@ const Navbar = () => {
 
   return (
     <header className="sticky top-0 z-50 bg-background/95 backdrop-blur border-b border-border">
-      <div className=" mx-auto flex items-center justify-between h-16 md:h-20 px-8">
-        <Link to="/" className="flex items-center gap-2  shrink-0">
+      <div className="mx-auto flex items-center justify-between h-16 md:h-20 px-8">
+        <Link to="/" className="flex items-center gap-2 shrink-0">
           {/* Logo Image with responsive sizing */}
           <div className="relative">
            <img 
@@ -107,7 +107,7 @@ onError={(e) => {
       {/* Mobile Nav */}
       {open && (
         <div className="lg:hidden bg-background border-t border-border max-h-[80vh] overflow-y-auto">
-          <nav className=" mx-auto py-4 px-4 flex flex-col gap-1">
+          <nav className="mx-auto py-4 px-4 flex flex-col gap-1">
             {navLinks.map((link) => (
               <Link
                 key={link.path}
@@ -122,6 +122,10 @@ onError={(e) => {
                 {link.label}
               </Link>
             ))}
+            {/* Pay Now button in mobile menu */}
+            <Link to="/payment" onClick={() => setOpen(false)}>
+              <Button className="w-full mt-2">Pay Now</Button>
+            </Link>
             <Link to="/contact" onClick={() => setOpen(false)}>
               <Button className="w-full mt-2">Get in Touch</Button>
             </Link>

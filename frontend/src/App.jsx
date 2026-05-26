@@ -22,6 +22,7 @@ import { HelmetProvider } from "react-helmet-async";
 import Paymentpage from "./pages/Paymentpage";
 import PaymentSuccess from "./component/payment/PaymentSuccess";
 import PaymentFailed from "./component/payment/PaymentFailed";
+import Council from "./pages/Council";
 
 // ScrollToTop Component - This will scroll to top on route change
 const ScrollToTop = () => {
@@ -64,6 +65,7 @@ function App() {
         <Route path="/payment" element={<Paymentpage />} />
         <Route path="/payment-success" element={<PaymentSuccess />} />
 <Route path="/payment-failed" element={<PaymentFailed />} />
+<Route path="/council" element={<Council />} />
          
       </Routes>
       <Footer />
