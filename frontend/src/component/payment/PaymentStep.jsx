@@ -293,18 +293,6 @@ export default function PaymentStep() {
         mode: "production",
       });
 
-      eximpe.on("close", () => {
-        console.log("Payment checkout closed by user");
-        setLoading(false);
-        alert("Payment was cancelled. Please try again if you want to complete the payment.");
-      });
-
-      eximpe.on("error", (error) => {
-        console.error("Payment error event:", error);
-        setLoading(false);
-        alert("Payment error occurred. Please try again.");
-      });
-
       await eximpe.checkout({
         paymentSessionId: data.session_id,
       });
