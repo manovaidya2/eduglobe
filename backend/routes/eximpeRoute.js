@@ -377,6 +377,29 @@ const eximpeHeaders = () => ({
   "X-Client-Secret": process.env.EXIMPE_CLIENT_SECRET,
 });
 
+const normalizeStatus = (value) => {
+  if (!value) return "";
+  return String(value).trim().toUpperCase();
+};
+
+const isSuccessEvent = (eventType, paymentStatus, extendedStatus) => {
+  const event = normalizeStatus(eventType);
+  const status = normalizeStatus(paymentStatus);
+  const ext = normalizeStatus(extendedStatus);
+  return ["PAYMENT_SUCCESSFUL", "CAPTURED", "SUCCESS", "VERIFIED"].includes(event) ||
+         ["CAPTURED", "SUCCESS", "PAYMENT_SUCCESSFUL"].includes(status) ||
+         ["SUCCESS", "PAYMENT_SUCCESSFUL"].includes(ext);
+};
+
+const isFailedEvent = (eventType, paymentStatus, extendedStatus) => {
+  const event = normalizeStatus(eventType);
+  const status = normalizeStatus(paymentStatus);
+  const ext = normalizeStatus(extendedStatus);
+  return ["PAYMENT_FAILED", "FAILED"].includes(event) ||
+         ["FAILED", "PAYMENT_FAILED"].includes(status) ||
+         ["FAILED"].includes(ext);
+};
+
 router.post("/create-payment", async (req, res) => {
   try {
     const { amount, name, email, phone, country, state, pincode } = req.body;
@@ -424,7 +447,7 @@ router.post("/create-payment", async (req, res) => {
       amount: Number(amount).toFixed(2),
       currency: "INR",
       reference_id: referenceId,
-      return_url: process.env.PAYMENT_SUCCESS_URL,
+      return_url: `${process.env.PAYMENT_SUCCESS_URL}?ref=${referenceId}`,
       collection_mode: "hosted_payment",
       mop_type: "upi",
 
@@ -499,7 +522,7 @@ router.post("/create-payment", async (req, res) => {
       state: state.trim(),
       pincode: String(pincode).trim(),
 
-      status: "CREATED",
+      status: "PENDING",
       order_response: data,
     });
 
@@ -584,7 +607,7 @@ router.post(
 
       const webhook = req.body;
       const paymentData = webhook?.data || {};
-      const orderId = paymentData?.order_id;
+      const orderId = paymentData?.order_id || webhook?.order_id || webhook?.data?.order_id;
 
       if (!orderId) {
         return res.status(200).json({
@@ -600,31 +623,23 @@ router.post(
 
       let finalStatus = "PENDING";
 
-      if (
-        eventType === "PAYMENT_SUCCESSFUL" ||
-        paymentStatus === "CAPTURED" ||
-        extendedStatus === "SUCCESS"
-      ) {
+      if (isSuccessEvent(eventType, paymentStatus, extendedStatus)) {
         finalStatus = "SUCCESS";
-      } else if (
-        eventType === "PAYMENT_FAILED" ||
-        paymentStatus === "FAILED" ||
-        extendedStatus === "FAILED"
-      ) {
+      } else if (isFailedEvent(eventType, paymentStatus, extendedStatus)) {
         finalStatus = "FAILED";
       } else if (
-        eventType === "VERIFICATION_NEEDED" &&
-        verificationStatus === "VERIFIED"
+        normalizeStatus(eventType) === "VERIFICATION_NEEDED" &&
+        normalizeStatus(verificationStatus) === "VERIFIED"
       ) {
         finalStatus = "VERIFIED";
       } else {
-        finalStatus = eventType || paymentStatus || "PENDING";
+        finalStatus = normalizeStatus(eventType) || normalizeStatus(paymentStatus) || "PENDING";
       }
 
       const updateData = {
         status: finalStatus,
         payment_status:
-          paymentStatus || extendedStatus || verificationStatus || eventType,
+          normalizeStatus(paymentStatus) || normalizeStatus(extendedStatus) || normalizeStatus(verificationStatus) || normalizeStatus(eventType),
         payment_id: paymentData?.payment_id || null,
         mop_type: paymentData?.mop_type || null,
         bank_ref_num: paymentData?.bank_ref_num || null,
@@ -690,6 +705,31 @@ router.get("/payments/:orderId", async (req, res) => {
       return res.status(404).json({
         success: false,
         message: "Payment not found",
+      });
+    }
+
+    return res.json({
+      success: true,
+      data: payment,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+});
+
+router.get("/payments/reference/:referenceId", async (req, res) => {
+  try {
+    const payment = await Payment.findOne({
+      reference_id: req.params.referenceId,
+    });
+
+    if (!payment) {
+      return res.status(404).json({
+        success: false,
+        message: "Payment not found by reference id",
       });
     }
 

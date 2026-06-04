@@ -197,6 +197,12 @@ export default function PaymentStep() {
     pincode: "",
   });
 
+  const savePendingPayment = (paymentMeta) => {
+    if (typeof window !== "undefined" && window.sessionStorage) {
+      sessionStorage.setItem("eduglobePendingPayment", JSON.stringify(paymentMeta));
+    }
+  };
+
   const handleChange = (e) => {
     const { name, value } = e.target;
 
@@ -272,10 +278,31 @@ export default function PaymentStep() {
         return;
       }
 
+      savePendingPayment({
+        reference_id: data.reference_id,
+        order_id: data.order_id,
+        session_id: data.session_id,
+        amount: form.amount,
+        email: form.email.trim(),
+        phone: form.phone,
+      });
+
       const Eximpe = await loadEximpeSdk();
 
       const eximpe = new Eximpe({
         mode: "production",
+      });
+
+      eximpe.on("close", () => {
+        console.log("Payment checkout closed by user");
+        setLoading(false);
+        alert("Payment was cancelled. Please try again if you want to complete the payment.");
+      });
+
+      eximpe.on("error", (error) => {
+        console.error("Payment error event:", error);
+        setLoading(false);
+        alert("Payment error occurred. Please try again.");
       });
 
       await eximpe.checkout({
