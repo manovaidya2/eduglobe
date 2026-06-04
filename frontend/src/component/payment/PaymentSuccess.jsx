@@ -14,6 +14,28 @@ export default function PaymentSuccess() {
   const [statusText, setStatusText] = useState("");
   const [statusType, setStatusType] = useState("pending");
 
+  const normalizeStatus = (value) => {
+    if (!value) return "";
+    return String(value).trim().toUpperCase();
+  };
+
+  const effectiveStatus = (paymentData) => {
+    const paymentStatus = normalizeStatus(paymentData?.payment_status);
+    const status = normalizeStatus(paymentData?.status);
+    const successValues = ["CAPTURED", "SUCCESS", "PAYMENT_SUCCESSFUL", "VERIFIED"];
+    const failureValues = ["FAILED", "PAYMENT_FAILED"];
+
+    if (successValues.includes(paymentStatus) || failureValues.includes(paymentStatus)) {
+      return paymentStatus;
+    }
+
+    if (successValues.includes(status) || failureValues.includes(status)) {
+      return status;
+    }
+
+    return paymentStatus || status;
+  };
+
   useEffect(() => {
     const searchParams = new URLSearchParams(location.search);
     const referenceId = searchParams.get("ref");

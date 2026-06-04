@@ -52,31 +52,46 @@ export default function AdminPayments() {
     fetchPayments();
   }, []);
 
+  const normalizeStatus = (value) => {
+    if (!value) return "";
+    return String(value).trim().toUpperCase();
+  };
+
+  const effectiveStatus = (payment) => {
+    const paymentStatus = normalizeStatus(payment.payment_status);
+    const orderStatus = normalizeStatus(payment.status);
+
+    const successValues = ["CAPTURED", "SUCCESS", "PAYMENT_SUCCESSFUL", "VERIFIED"];
+    const failureValues = ["FAILED", "PAYMENT_FAILED"];
+
+    if (successValues.includes(paymentStatus) || failureValues.includes(paymentStatus)) {
+      return paymentStatus;
+    }
+
+    if (successValues.includes(orderStatus) || failureValues.includes(orderStatus)) {
+      return orderStatus;
+    }
+
+    return paymentStatus || orderStatus;
+  };
+
   // Function to check if payment is successful
   const isPaymentSuccessful = (payment) => {
-    const status = payment.payment_status || payment.status;
-    return status === "CAPTURED" || 
-           status === "SUCCESS" || 
-           status === "PAYMENT_SUCCESSFUL" || 
-           status === "VERIFIED";
+    const status = effectiveStatus(payment);
+    return ["CAPTURED", "SUCCESS", "PAYMENT_SUCCESSFUL", "VERIFIED"].includes(status);
   };
 
   // Function to check if payment is failed
   const isPaymentFailed = (payment) => {
-    const status = payment.payment_status || payment.status;
-    return status === "FAILED" || status === "PAYMENT_FAILED";
+    const status = effectiveStatus(payment);
+    return ["FAILED", "PAYMENT_FAILED"].includes(status);
   };
 
   // Function to check if payment is pending
   const isPaymentPending = (payment) => {
-    const status = payment.payment_status || payment.status;
-    return !status || 
-           (status !== "CAPTURED" && 
-            status !== "SUCCESS" && 
-            status !== "PAYMENT_SUCCESSFUL" && 
-            status !== "VERIFIED" &&
-            status !== "FAILED" && 
-            status !== "PAYMENT_FAILED");
+    const status = effectiveStatus(payment);
+    return !status ||
+           (!["CAPTURED", "SUCCESS", "PAYMENT_SUCCESSFUL", "VERIFIED", "FAILED", "PAYMENT_FAILED"].includes(status));
   };
 
   // Get successful payments only for revenue calculation

@@ -636,10 +636,30 @@ router.post(
         finalStatus = normalizeStatus(eventType) || normalizeStatus(paymentStatus) || "PENDING";
       }
 
+      const statusFailed = isFailedEvent(eventType, paymentStatus, extendedStatus);
+      const statusSuccess = isSuccessEvent(eventType, paymentStatus, extendedStatus);
+
+      const existingPayment = await Payment.findOne({ order_id: orderId });
+      const existingEffectiveStatus =
+        normalizeStatus(existingPayment?.payment_status) || normalizeStatus(existingPayment?.status);
+      const existingIsSuccess = ["CAPTURED", "SUCCESS", "PAYMENT_SUCCESSFUL", "VERIFIED"].includes(
+        existingEffectiveStatus
+      );
+
+      let finalPaymentStatus =
+        normalizeStatus(paymentStatus) ||
+        normalizeStatus(extendedStatus) ||
+        normalizeStatus(verificationStatus) ||
+        normalizeStatus(eventType);
+
+      if (existingIsSuccess && !statusFailed && !statusSuccess) {
+        finalStatus = existingEffectiveStatus || finalStatus;
+        finalPaymentStatus = existingEffectiveStatus || finalPaymentStatus;
+      }
+
       const updateData = {
         status: finalStatus,
-        payment_status:
-          normalizeStatus(paymentStatus) || normalizeStatus(extendedStatus) || normalizeStatus(verificationStatus) || normalizeStatus(eventType),
+        payment_status: finalPaymentStatus,
         payment_id: paymentData?.payment_id || null,
         mop_type: paymentData?.mop_type || null,
         bank_ref_num: paymentData?.bank_ref_num || null,
