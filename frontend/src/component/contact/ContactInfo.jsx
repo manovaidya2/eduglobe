@@ -33,10 +33,10 @@ const contactDetails = [
     icon: MapPinIcon,
     label: "Office Location",
     value: [
-      "Head Office: EduGlobe Services FZ-LLC",
+      // "Head Office: EduGlobe Services FZ-LLC",
       "Ras Al Khaimah(RAK), UAE.",
-      "Coordinating Office: Unit No. 209-04, Al Kazim, ",
-      "2nd floor, Hor Alz Anz, Dubai, UAE(Near Al Qiyadah Metro Station).",
+      // "Coordinating Office: Unit No. 209-04, Al Kazim, ",
+      // "2nd floor, Hor Alz Anz, Dubai, UAE(Near Al Qiyadah Metro Station).",
     ],
   },
   {

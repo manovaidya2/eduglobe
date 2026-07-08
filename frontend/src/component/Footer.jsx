@@ -127,8 +127,8 @@ onError={(e) => {
   Al Hamra Industrial Zone-FZ,<br />
   Ras Al Khaimah, United Arab Emirates. */}
 
-  EduGlobe Services FZ-LLC, Ras Al Khaimah(RAK), UAE.<br />
-  <strong>Co ordination office :</strong> Unit No. 209-04, Al Kazim, 2nd floor, Hor Alz Anz, Dubai, UAE(Near Al Qiyadah Metro Station).
+  Ras Al Khaimah(RAK), UAE.<br />
+  {/* <strong>Co ordination office :</strong> Unit No. 209-04, Al Kazim, 2nd floor, Hor Alz Anz, Dubai, UAE(Near Al Qiyadah Metro Station). */}
   {/* <br /><br /> */}
 
   {/* <strong>Coordinating Office:</strong><br />
