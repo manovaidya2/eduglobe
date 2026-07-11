@@ -81,59 +81,46 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-800 flex items-center justify-center p-4 relative overflow-hidden">
-      
-      {/* Animated background elements */}
-      <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute -top-40 -right-40 w-80 h-80 bg-purple-300 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob"></div>
-        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-yellow-300 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-2000"></div>
-        <div className="absolute top-40 left-40 w-80 h-80 bg-pink-300 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-4000"></div>
-      </div>
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+      <div className="w-full max-w-4xl bg-white rounded-2xl shadow-xl overflow-hidden grid md:grid-cols-2">
 
-      {/* Floating particles */}
-      <div className="absolute inset-0">
-        {[...Array(20)].map((_, i) => (
-          <div
-            key={i}
-            className="absolute bg-white rounded-full opacity-20 animate-float"
-            style={{
-              width: `${Math.random() * 6 + 2}px`,
-              height: `${Math.random() * 6 + 2}px`,
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
-              animationDelay: `${Math.random() * 5}s`,
-              animationDuration: `${Math.random() * 10 + 10}s`
-            }}
-          />
-        ))}
-      </div>
+        {/* Left Branding Panel */}
+        <div className="hidden md:flex flex-col justify-between bg-gradient-to-br from-red-600 to-red-800 p-10 text-white relative overflow-hidden">
+          <div className="absolute -top-24 -right-24 w-64 h-64 bg-white/10 rounded-full"></div>
+          <div className="absolute -bottom-24 -left-16 w-64 h-64 bg-white/10 rounded-full"></div>
 
-      {/* Main Card */}
-      <div className="relative w-full max-w-md">
-        {/* Decorative elements */}
-        <div className="absolute -inset-1 bg-gradient-to-r from-pink-600 to-purple-600 rounded-3xl blur-xl opacity-30 animate-pulse"></div>
-        
-        <div className="relative bg-white/10 backdrop-blur-xl rounded-3xl shadow-2xl p-8 border border-white/20">
-          
-          {/* Logo/Brand */}
-          <div className="text-center mb-8">
-            <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-purple-500 to-pink-500 rounded-2xl mb-4 shadow-lg transform hover:scale-110 transition-transform duration-300">
-              <Sparkles className="w-10 h-10 text-white" />
+          <div className="relative z-10">
+            <div className="inline-flex items-center justify-center w-14 h-14 bg-white/15 rounded-xl mb-6">
+              <Sparkles className="w-7 h-7 text-white" />
             </div>
-            <h1 className="text-3xl font-bold text-white mb-2">Welcome Back</h1>
-            <p className="text-purple-200">Sign in to continue your journey</p>
+            <h1 className="text-3xl font-bold mb-3">EduGlobe Admin</h1>
+            <p className="text-red-100 leading-relaxed">
+              Manage courses, students and content from a single, secure dashboard.
+            </p>
           </div>
 
-          <form onSubmit={handleLogin} className="space-y-6">
-            
+          <p className="relative z-10 text-sm text-red-100/80">
+            &copy; {new Date().getFullYear()} EduGlobe. All rights reserved.
+          </p>
+        </div>
+
+        {/* Right Form Panel */}
+        <div className="p-8 sm:p-12 flex flex-col justify-center">
+          <div className="mb-8">
+            <h2 className="text-2xl font-bold text-gray-900">Welcome back</h2>
+            <p className="text-gray-500 mt-1">Sign in to your admin account</p>
+          </div>
+
+          <form onSubmit={handleLogin} className="space-y-5">
+
             {/* Username Field */}
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-purple-200 block">
+            <div className="space-y-1.5">
+              <label className="text-sm font-medium text-gray-700 block">
                 Username
               </label>
-              <div className="relative group">
+              <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <User className="h-5 w-5 text-purple-300 group-focus-within:text-purple-400 transition-colors" />
+                  <User className="h-5 w-5 text-gray-400" />
                 </div>
                 <input
                   type="text"
@@ -142,27 +129,26 @@ const Login = () => {
                     setUsername(e.target.value);
                     setErrors({ ...errors, username: "" });
                   }}
-                  className={`w-full pl-10 pr-3 py-3 bg-white/10 border ${
-                    errors.username ? 'border-red-400' : 'border-white/20'
-                  } rounded-xl text-white placeholder-purple-300/50 focus:outline-none focus:border-purple-400 focus:ring-2 focus:ring-purple-400/20 transition-all`}
+                  className={`w-full pl-10 pr-3 py-2.5 bg-white border ${
+                    errors.username ? 'border-red-500' : 'border-gray-300'
+                  } rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:border-red-500 focus:ring-2 focus:ring-red-500/20 transition-all`}
                   placeholder="Enter your username"
                   autoFocus
                 />
-                <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-purple-500/0 to-pink-500/0 group-focus-within:from-purple-500/10 group-focus-within:to-pink-500/10 transition-all pointer-events-none"></div>
               </div>
               {errors.username && (
-                <p className="text-red-400 text-sm mt-1 animate-shake">{errors.username}</p>
+                <p className="text-red-600 text-sm mt-1">{errors.username}</p>
               )}
             </div>
 
             {/* Password Field */}
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-purple-200 block">
+            <div className="space-y-1.5">
+              <label className="text-sm font-medium text-gray-700 block">
                 Password
               </label>
-              <div className="relative group">
+              <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Lock className="h-5 w-5 text-purple-300 group-focus-within:text-purple-400 transition-colors" />
+                  <Lock className="h-5 w-5 text-gray-400" />
                 </div>
                 <input
                   type={showPassword ? "text" : "password"}
@@ -171,9 +157,9 @@ const Login = () => {
                     setPassword(e.target.value);
                     setErrors({ ...errors, password: "" });
                   }}
-                  className={`w-full pl-10 pr-10 py-3 bg-white/10 border ${
-                    errors.password ? 'border-red-400' : 'border-white/20'
-                  } rounded-xl text-white placeholder-purple-300/50 focus:outline-none focus:border-purple-400 focus:ring-2 focus:ring-purple-400/20 transition-all`}
+                  className={`w-full pl-10 pr-10 py-2.5 bg-white border ${
+                    errors.password ? 'border-red-500' : 'border-gray-300'
+                  } rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:border-red-500 focus:ring-2 focus:ring-red-500/20 transition-all`}
                   placeholder="Enter your password"
                 />
                 <button
@@ -182,15 +168,14 @@ const Login = () => {
                   className="absolute inset-y-0 right-0 pr-3 flex items-center"
                 >
                   {showPassword ? (
-                    <EyeOff className="h-5 w-5 text-purple-300 hover:text-purple-400 transition-colors" />
+                    <EyeOff className="h-5 w-5 text-gray-400 hover:text-gray-600 transition-colors" />
                   ) : (
-                    <Eye className="h-5 w-5 text-purple-300 hover:text-purple-400 transition-colors" />
+                    <Eye className="h-5 w-5 text-gray-400 hover:text-gray-600 transition-colors" />
                   )}
                 </button>
-                <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-purple-500/0 to-pink-500/0 group-focus-within:from-purple-500/10 group-focus-within:to-pink-500/10 transition-all pointer-events-none"></div>
               </div>
               {errors.password && (
-                <p className="text-red-400 text-sm mt-1 animate-shake">{errors.password}</p>
+                <p className="text-red-600 text-sm mt-1">{errors.password}</p>
               )}
             </div>
 
@@ -201,15 +186,15 @@ const Login = () => {
                   type="checkbox"
                   checked={rememberMe}
                   onChange={(e) => setRememberMe(e.target.checked)}
-                  className="w-4 h-4 bg-white/10 border border-white/20 rounded focus:ring-purple-400 focus:ring-2 text-purple-500 transition-all cursor-pointer"
+                  className="w-4 h-4 rounded border-gray-300 text-red-600 focus:ring-red-500/40 focus:ring-2 transition-all cursor-pointer"
                 />
-                <span className="text-sm text-purple-200 group-hover:text-white transition-colors">
+                <span className="text-sm text-gray-600 group-hover:text-gray-900 transition-colors">
                   Remember me
                 </span>
               </label>
               <a
                 href="#"
-                className="text-sm text-purple-200 hover:text-white transition-colors"
+                className="text-sm text-red-600 hover:text-red-700 font-medium transition-colors"
               >
                 Forgot password?
               </a>
@@ -219,9 +204,8 @@ const Login = () => {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full py-3 px-4 bg-gradient-to-r from-purple-500 to-pink-500 text-white font-semibold rounded-xl hover:from-purple-600 hover:to-pink-600 focus:outline-none focus:ring-2 focus:ring-purple-400 focus:ring-offset-2 focus:ring-offset-transparent transform hover:scale-[1.02] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 relative overflow-hidden group"
+              className="w-full py-2.5 px-4 bg-red-600 text-white font-semibold rounded-lg hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></span>
               {isLoading ? (
                 <div className="flex items-center justify-center space-x-2">
                   <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
@@ -234,86 +218,17 @@ const Login = () => {
                 </div>
               )}
             </button>
-
-            {/* Quick Login Hints */}
-            <div className="mt-4 space-y-2">
-              <div className="bg-white/5 rounded-lg p-3 border border-white/10">
-                <p className="text-xs text-purple-300 mb-2 flex items-center gap-1">
-                  <Sparkles className="w-3 h-3" /> Quick Login:
-                </p>
-                <div className="flex flex-col gap-1 text-xs">
-                  <div className="flex justify-between items-center">
-                    <span className="text-purple-300">Main Account:</span>
-                    <code className="bg-purple-900/50 px-2 py-0.5 rounded text-white font-mono">manovaidya</code>
-                    <code className="bg-pink-900/50 px-2 py-0.5 rounded text-white font-mono">manovaidya@123</code>
-                  </div>
-                  <div className="flex justify-between items-center text-purple-400/70">
-                    <span className="text-purple-300">Demo Accounts:</span>
-                    <span className="text-xs text-purple-300">(email/pass)</span>
-                  </div>
-                  <div className="grid grid-cols-2 gap-1 mt-1">
-                    <div className="flex flex-col">
-                      <span className="text-purple-300">admin@example.com</span>
-                      <span className="text-purple-300">teacher@example.com</span>
-                    </div>
-                    <div className="flex flex-col">
-                      <span className="text-purple-300">••••••</span>
-                      <span className="text-purple-300">••••••</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
           </form>
 
           {/* Footer */}
-          <p className="mt-6 text-center text-sm text-purple-300">
+          <p className="mt-8 text-center text-sm text-gray-500">
             Don't have an account?{' '}
-            <a href="#" className="text-white hover:underline font-medium">
+            <a href="#" className="text-red-600 hover:text-red-700 font-medium">
               Contact Admin
             </a>
           </p>
         </div>
       </div>
-
-      <style jsx>{`
-        @keyframes blob {
-          0%, 100% { transform: translate(0, 0) scale(1); }
-          33% { transform: translate(30px, -50px) scale(1.1); }
-          66% { transform: translate(-20px, 20px) scale(0.9); }
-        }
-        
-        @keyframes float {
-          0%, 100% { transform: translateY(0px); }
-          50% { transform: translateY(-20px); }
-        }
-        
-        @keyframes shake {
-          0%, 100% { transform: translateX(0); }
-          10%, 30%, 50%, 70%, 90% { transform: translateX(-2px); }
-          20%, 40%, 60%, 80% { transform: translateX(2px); }
-        }
-        
-        .animate-blob {
-          animation: blob 7s infinite;
-        }
-        
-        .animate-float {
-          animation: float 15s infinite ease-in-out;
-        }
-        
-        .animate-shake {
-          animation: shake 0.5s ease-in-out;
-        }
-        
-        .animation-delay-2000 {
-          animation-delay: 2s;
-        }
-        
-        .animation-delay-4000 {
-          animation-delay: 4s;
-        }
-      `}</style>
     </div>
   );
 };

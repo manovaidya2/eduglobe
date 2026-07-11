@@ -86,7 +86,7 @@ export default function AdminAddUniversity() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 flex items-center justify-center p-6">
+    <div className="flex items-center justify-center py-10">
       <form onSubmit={handleSubmit} className="bg-white shadow-xl rounded-2xl p-6 w-full max-w-2xl space-y-5">
         <h2 className="text-2xl font-bold text-gray-800 text-center">Add Associates</h2>
 

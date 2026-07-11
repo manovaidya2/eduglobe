@@ -1,39 +1,28 @@
 import React, { useState, useEffect } from "react";
 import { FaBars, FaBell, FaUserCircle, FaSearch, FaSignOutAlt, FaUser, FaCog } from "react-icons/fa";
-import { MdClose } from "react-icons/md";
 import Sidebar from "./Sidebar";
 import { Link, useNavigate } from "react-router-dom";
 
-const Navbar = () => {
+const Navbar = ({ collapsed, onToggleCollapse }) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const navigate = useNavigate();
 
   // Handle scroll effect
   useEffect(() => {
-    const handleScroll = () => {
-      if (window.scrollY > 10) {
-        setScrolled(true);
-      } else {
-        setScrolled(false);
-      }
-    };
+    const handleScroll = () => setScrolled(window.scrollY > 10);
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Handle window resize
+  // Close sidebar overlay on desktop resize
   useEffect(() => {
     const handleResize = () => {
-      setIsMobile(window.innerWidth < 768);
       if (window.innerWidth >= 768) {
         setIsSidebarOpen(false);
-        setIsProfileOpen(false);
       }
     };
-    handleResize();
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
@@ -50,28 +39,29 @@ const Navbar = () => {
   }, [isProfileOpen]);
 
   const handleLogout = () => {
-    // Add logout logic here
     navigate("/login");
   };
 
+  const sidebarMargin = collapsed ? "md:ml-20" : "md:ml-64";
+
   return (
     <>
-      {/* Top Navbar (Sticky with glassmorphism) */}
+      {/* Top Navbar */}
       <nav
         className={`
-          bg-gradient-to-r from-[#0A2540] to-[#0F3B5C] 
-          text-white flex justify-between items-center 
+          bg-white text-gray-800
+          flex justify-between items-center
           fixed top-0 left-0 right-0 z-40
-          transition-all duration-300
-          ${scrolled ? "shadow-lg backdrop-blur-lg bg-opacity-95" : "shadow-md"}
-          md:ml-64 px-4 md:px-6 py-3
+          transition-all duration-300 border-b border-gray-200
+          ${scrolled ? "shadow-md" : "shadow-sm"}
+          ${sidebarMargin} px-4 md:px-6 py-3
         `}
       >
-        {/* Left Section - Menu Icon and Brand */}
+        {/* Left Section */}
         <div className="flex items-center gap-4">
           {/* Menu Icon for mobile */}
           <button
-            className="md:hidden text-2xl hover:text-[#00D4FF] transition-colors duration-200"
+            className="md:hidden text-xl text-gray-500 hover:text-red-600 transition-colors duration-200"
             onClick={() => setIsSidebarOpen(true)}
             aria-label="Open menu"
           >
@@ -80,95 +70,93 @@ const Navbar = () => {
 
           {/* Mobile Brand */}
           <div className="md:hidden flex items-center gap-2">
-            <div className="w-8 h-8 bg-gradient-to-br from-[#00D4FF] to-[#0088FF] rounded-lg flex items-center justify-center">
-              <span className="text-[#0A2540] font-bold text-sm">E</span>
+            <div className="w-8 h-8 bg-gradient-to-br from-red-600 to-red-700 rounded-lg flex items-center justify-center">
+              <span className="text-white font-bold text-sm">E</span>
             </div>
-            <span className="font-bold text-sm bg-gradient-to-r from-[#00D4FF] to-[#0088FF] bg-clip-text text-transparent">
-              EDUGLOBE
-            </span>
+            <span className="font-bold text-sm text-gray-900">EDUGLOBE</span>
           </div>
 
           {/* Desktop Welcome Message */}
           <div className="hidden md:block">
-            <h2 className="text-lg font-semibold">
-              Welcome back, <span className="text-[#00D4FF]">Admin</span>
+            <h2 className="text-lg font-semibold text-gray-900">
+              Welcome back, <span className="text-red-600">Admin</span>
             </h2>
             <p className="text-xs text-gray-400">Global education platform</p>
           </div>
         </div>
 
-        {/* Right Section - Search, Notifications, Profile */}
+        {/* Right Section */}
         <div className="flex items-center gap-3 md:gap-4">
           {/* Search Bar - Hidden on mobile */}
-          <div className="hidden md:flex items-center bg-white/10 rounded-lg px-3 py-1.5 hover:bg-white/20 transition-all duration-300">
+          <div className="hidden md:flex items-center bg-gray-50 border border-gray-200 rounded-lg px-3 py-1.5 focus-within:border-red-400 focus-within:ring-2 focus-within:ring-red-500/10 transition-all duration-200">
             <FaSearch className="text-gray-400 text-sm" />
             <input
               type="text"
               placeholder="Search courses..."
-              className="bg-transparent outline-none text-sm px-2 py-1 text-white placeholder-gray-400 w-48"
+              className="bg-transparent outline-none text-sm px-2 py-1 text-gray-800 placeholder-gray-400 w-48"
             />
           </div>
 
           {/* Notifications */}
-          <button className="relative p-2 hover:bg-white/10 rounded-lg transition-all duration-200 group">
-            <FaBell className="text-lg group-hover:text-[#00D4FF] transition-colors" />
-            <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
+          <button className="relative p-2 hover:bg-gray-50 rounded-lg transition-all duration-200 group">
+            <FaBell className="text-lg text-gray-500 group-hover:text-red-600 transition-colors" />
+            <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full"></span>
           </button>
 
           {/* Profile Dropdown */}
           <div className="relative profile-menu">
             <button
               onClick={() => setIsProfileOpen(!isProfileOpen)}
-              className="flex items-center gap-2 hover:bg-white/10 rounded-lg px-2 py-1.5 transition-all duration-200 group"
+              className="flex items-center gap-2 hover:bg-gray-50 rounded-lg px-2 py-1.5 transition-all duration-200"
               aria-label="Profile menu"
             >
-              <div className="w-8 h-8 bg-gradient-to-br from-[#00D4FF] to-[#0088FF] rounded-full flex items-center justify-center">
-                <FaUserCircle className="text-[#0A2540] text-xl" />
+              <div className="w-8 h-8 bg-gradient-to-br from-red-600 to-red-700 rounded-full flex items-center justify-center">
+                <FaUserCircle className="text-white text-xl" />
               </div>
               <div className="hidden md:block text-left">
-                <p className="text-sm font-medium">Administrator</p>
+                <p className="text-sm font-medium text-gray-900">Administrator</p>
                 <p className="text-xs text-gray-400">Admin Account</p>
               </div>
             </button>
 
             {/* Dropdown Menu */}
             {isProfileOpen && (
-              <div className="absolute right-0 mt-2 w-64 bg-[#0F3B5C] rounded-xl shadow-2xl border border-[#00D4FF]/20 overflow-hidden z-50 animate-slideDown">
-                <div className="p-4 border-b border-[#00D4FF]/20">
+              <div className="absolute right-0 mt-2 w-64 bg-white rounded-xl shadow-xl border border-gray-200 overflow-hidden z-50">
+                <div className="p-4 border-b border-gray-100">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-gradient-to-br from-[#00D4FF] to-[#0088FF] rounded-full flex items-center justify-center">
-                      <FaUserCircle className="text-[#0A2540] text-2xl" />
+                    <div className="w-10 h-10 bg-gradient-to-br from-red-600 to-red-700 rounded-full flex items-center justify-center">
+                      <FaUserCircle className="text-white text-2xl" />
                     </div>
                     <div>
-                      <p className="font-semibold text-white">Administrator</p>
+                      <p className="font-semibold text-gray-900">Administrator</p>
                       <p className="text-xs text-gray-400">admin@eduglobe.com</p>
                     </div>
                   </div>
                 </div>
-                
+
                 <div className="py-2">
                   <Link
                     to="/profile"
-                    className="flex items-center gap-3 px-4 py-2 hover:bg-white/10 transition-colors"
+                    className="flex items-center gap-3 px-4 py-2 hover:bg-gray-50 transition-colors"
                     onClick={() => setIsProfileOpen(false)}
                   >
-                    <FaUser className="text-[#00D4FF] text-sm" />
-                    <span className="text-sm text-gray-300">My Profile</span>
+                    <FaUser className="text-red-600 text-sm" />
+                    <span className="text-sm text-gray-700">My Profile</span>
                   </Link>
                   <Link
                     to="/settings"
-                    className="flex items-center gap-3 px-4 py-2 hover:bg-white/10 transition-colors"
+                    className="flex items-center gap-3 px-4 py-2 hover:bg-gray-50 transition-colors"
                     onClick={() => setIsProfileOpen(false)}
                   >
-                    <FaCog className="text-[#00D4FF] text-sm" />
-                    <span className="text-sm text-gray-300">Settings</span>
+                    <FaCog className="text-red-600 text-sm" />
+                    <span className="text-sm text-gray-700">Settings</span>
                   </Link>
                   <button
                     onClick={handleLogout}
-                    className="w-full flex items-center gap-3 px-4 py-2 hover:bg-white/10 transition-colors border-t border-[#00D4FF]/20 mt-1"
+                    className="w-full flex items-center gap-3 px-4 py-2 hover:bg-gray-50 transition-colors border-t border-gray-100 mt-1"
                   >
-                    <FaSignOutAlt className="text-red-400 text-sm" />
-                    <span className="text-sm text-red-400">Logout</span>
+                    <FaSignOutAlt className="text-red-600 text-sm" />
+                    <span className="text-sm text-red-600">Logout</span>
                   </button>
                 </div>
               </div>
@@ -178,38 +166,31 @@ const Navbar = () => {
       </nav>
 
       {/* Sidebar always visible on desktop */}
-      <div className="hidden md:block fixed left-0 top-0 h-screen w-64 z-30">
-        <Sidebar />
+      <div className={`hidden md:block fixed left-0 top-0 h-screen z-30 transition-all duration-300 ${collapsed ? "w-20" : "w-64"}`}>
+        <Sidebar collapsed={collapsed} onToggleCollapse={onToggleCollapse} />
       </div>
 
       {/* Sidebar overlay on mobile */}
       {isSidebarOpen && (
         <div className="fixed inset-0 z-50 flex md:hidden">
           <div className="relative w-64">
-            <Sidebar />
-            <button
-              className="absolute top-4 right-4 text-white hover:text-[#00D4FF] transition-colors"
-              onClick={() => setIsSidebarOpen(false)}
-              aria-label="Close menu"
-            >
-              <MdClose size={24} />
-            </button>
+            <Sidebar onClose={() => setIsSidebarOpen(false)} />
           </div>
           <div
-            className="flex-1 bg-black bg-opacity-50 backdrop-blur-sm"
+            className="flex-1 bg-black/40 backdrop-blur-sm"
             onClick={() => setIsSidebarOpen(false)}
           ></div>
         </div>
       )}
 
-      {/* Mobile Search Bar - Visible only on mobile */}
-      <div className="md:hidden fixed top-14 left-0 right-0 z-30 px-4 pt-2 pb-3 bg-gradient-to-r from-[#0A2540] to-[#0F3B5C] shadow-md">
-        <div className="flex items-center bg-white/10 rounded-lg px-3 py-2">
+      {/* Mobile Search Bar */}
+      <div className="md:hidden fixed top-14 left-0 right-0 z-30 px-4 pt-2 pb-3 bg-white border-b border-gray-200 shadow-sm">
+        <div className="flex items-center bg-gray-50 border border-gray-200 rounded-lg px-3 py-2">
           <FaSearch className="text-gray-400 text-sm" />
           <input
             type="text"
             placeholder="Search courses, lessons..."
-            className="bg-transparent outline-none text-sm px-2 text-white placeholder-gray-400 flex-1"
+            className="bg-transparent outline-none text-sm px-2 text-gray-800 placeholder-gray-400 flex-1"
           />
         </div>
       </div>
@@ -217,23 +198,6 @@ const Navbar = () => {
       {/* Spacer for navbar and mobile search */}
       <div className="h-16 md:h-20"></div>
       <div className="md:hidden h-12"></div>
-
-      <style jsx>{`
-        @keyframes slideDown {
-          from {
-            opacity: 0;
-            transform: translateY(-10px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-        
-        .animate-slideDown {
-          animation: slideDown 0.2s ease-out;
-        }
-      `}</style>
     </>
   );
 };

@@ -18,8 +18,7 @@ import {
   FaArrowDown,
   FaEllipsisV,
   FaSearch,
-  FaBell,
-  FaUserCircle
+  FaBell
 } from "react-icons/fa";
 import { 
   MdAppShortcut, 
@@ -366,7 +365,7 @@ const Dashboard = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="flex items-center justify-center py-24">
         <div className="text-center">
           <div className="relative">
             <div className="w-20 h-20 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin"></div>
@@ -381,9 +380,9 @@ const Dashboard = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6 lg:p-8 relative">
+    <div className="relative">
       {/* Background decorative elements */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none">
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-0 left-0 w-96 h-96 bg-indigo-200 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob"></div>
         <div className="absolute top-0 right-0 w-96 h-96 bg-purple-200 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-2000"></div>
         <div className="absolute bottom-0 left-0 w-96 h-96 bg-green-200 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-4000"></div>
@@ -405,7 +404,7 @@ const Dashboard = () => {
                 <MdRefresh className={`w-5 h-5 text-gray-500 group-hover:text-indigo-600 group-hover:rotate-180 transition-all duration-500 ${refreshing ? 'animate-spin' : ''}`} />
               </button>
             </h1>
-            <p className="text-gray-500 mt-1">Welcome back, Dr. Ankush Garg</p>
+            <p className="text-gray-500 mt-1">Welcome back, Admin</p>
           </div>
 
           {/* Right side actions */}
@@ -432,15 +431,6 @@ const Dashboard = () => {
               </button>
               
               {/* Notifications dropdown - can be implemented later */}
-            </div>
-
-            {/* Profile */}
-            <div className="flex items-center gap-2 bg-white px-3 py-2 rounded-xl">
-              <FaUserCircle className="w-8 h-8 text-indigo-600" />
-              <div className="hidden lg:block">
-                <p className="text-sm font-medium text-gray-700">Dr. Ankush Garg</p>
-                <p className="text-xs text-gray-500">Administrator</p>
-              </div>
             </div>
           </div>
         </div>
